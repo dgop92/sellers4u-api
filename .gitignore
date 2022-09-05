@@ -1,0 +1,7 @@
+node_modules
+build/
+.idea
+*.env
+
+http_tests
+generated-oapi
