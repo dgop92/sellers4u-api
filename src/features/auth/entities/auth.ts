@@ -1,17 +1,6 @@
 import Joi from "joi";
 
-export interface User {
-  id: number;
-  email: string;
-}
-
-export const UserSearchInputSchema = Joi.object({
-  searchBy: Joi.object({
-    email: Joi.string().max(200).optional(),
-  }).optional(),
-}).meta({ className: "UserSearchInput" });
-
-export const UserCreateInputSchema = Joi.object({
+export const LoginInputSchema = Joi.object({
   data: Joi.object({
     email: Joi.string().max(200).required(),
     // Password must have at least 8 characters, an uppercase letter, a lowercase letter and a number
@@ -21,4 +10,4 @@ export const UserCreateInputSchema = Joi.object({
       )
       .required(),
   }).required(),
-}).meta({ className: "UserCreateInput" });
+}).meta({ className: "LoginInput" });

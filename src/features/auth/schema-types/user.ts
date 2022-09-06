@@ -3,9 +3,15 @@
  * Do not modify this file manually
  */
 
+export interface UserCreateInput {
+  data: {
+    email: string;
+    password: string;
+  };
+}
+
 export interface UserSearchInput {
   searchBy?: {
     email?: string;
-    username?: string;
   };
 }

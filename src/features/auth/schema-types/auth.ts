@@ -3,5 +3,9 @@
  * Do not modify this file manually
  */
 
-export * from './auth';
-export * from './user';
+export interface LoginInput {
+  data: {
+    email: string;
+    password: string;
+  };
+}
