@@ -23,4 +23,9 @@ export const APP_ENV_VARS = {
     ),
     logging: parseBoolOrThrow(getOsEnvOrDefault("TYPEORM_LOGGING", "false")),
   },
+  auth0: {
+    domain: getOsEnv("AUTH0_DOMAIN"),
+    clientId: getOsEnv("AUTH0_CLIENT_ID"),
+    clientSecret: getOsEnv("AUTH0_CLIENT_SECRET"),
+  },
 };
