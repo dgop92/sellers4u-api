@@ -1,6 +1,6 @@
 import "reflect-metadata";
-import { AppLogger } from "@common/logger";
-import { WinstonLogger, createDevLogger } from "./logging/winston-logger";
+import { AppLogger } from "@common/logging/logger";
+import { WinstonLogger, createDevLogger } from "@common/logging/winston-logger";
 import { HttpAdapterHost, NestFactory } from "@nestjs/core";
 import { AppDataSource } from "./db/data-source";
 import { AppModule } from "./nest/app.module";

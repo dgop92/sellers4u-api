@@ -1,6 +1,6 @@
 import morgan from "morgan";
 import { Injectable, NestMiddleware } from "@nestjs/common";
-import { AppLogger } from "@common/logger";
+import { AppLogger } from "@common/logging/logger";
 
 // TODO see performance impact of this middleware
 // reason: creating a new function for each request

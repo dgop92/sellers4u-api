@@ -1,4 +1,4 @@
-import { ILogger } from "@common/logger";
+import { ILogger } from "./logger";
 import winston from "winston";
 const winsFormat = winston.format;
 
@@ -74,4 +74,8 @@ export function createDevLogger() {
 
   winston.addColors(MY_CUSTOM_LEVELS.colors);
   return logger;
+}
+
+export function createTestLogger() {
+  return createDevLogger();
 }

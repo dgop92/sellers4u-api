@@ -1,4 +1,4 @@
-import { APP_ENV_VARS } from "../config/app-env-vars";
+import { APP_ENV_VARS } from "@common/config/app-env-vars";
 import { DataSource } from "typeorm";
 
 export const AppDataSource = new DataSource({

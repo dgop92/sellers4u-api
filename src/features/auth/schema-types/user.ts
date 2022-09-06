@@ -13,5 +13,6 @@ export interface UserCreateInput {
 export interface UserSearchInput {
   searchBy?: {
     email?: string;
+    id?: string;
   };
 }
