@@ -27,5 +27,6 @@ export const APP_ENV_VARS = {
     domain: getOsEnv("AUTH0_DOMAIN"),
     clientId: getOsEnv("AUTH0_CLIENT_ID"),
     clientSecret: getOsEnv("AUTH0_CLIENT_SECRET"),
+    dbConnectionName: getOsEnv("AUTH0_DB_CONNECTION_NAME"),
   },
 };

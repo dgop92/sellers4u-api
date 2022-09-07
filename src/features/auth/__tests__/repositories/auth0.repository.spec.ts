@@ -7,6 +7,7 @@ import {
   createTestLogger,
   WinstonLogger,
 } from "@common/logging/winston-logger";
+import { APP_ENV_VARS } from "@common/config/app-env-vars";
 
 const fileUUId = uuidv4();
 
@@ -20,7 +21,10 @@ describe("auth0 repository spec", () => {
 
   beforeAll(() => {
     const managementClient = getAuth0ManagementClient();
-    auth0UserRepository = new Auth0UserRepository(managementClient);
+    auth0UserRepository = new Auth0UserRepository(
+      managementClient,
+      APP_ENV_VARS.auth0.dbConnectionName
+    );
   });
 
   describe("Create", () => {
