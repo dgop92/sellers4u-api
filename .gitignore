@@ -5,3 +5,4 @@ build/
 
 http_tests
 generated-oapi
+firebase-credentials

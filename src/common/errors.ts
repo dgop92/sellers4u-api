@@ -4,6 +4,7 @@ export enum ErrorCode {
   INVALID_INPUT = "invalid-input",
   INVALID_ID = "invalid-id",
   INVALID_OPERATION = "invalid-operation",
+  DUPLICATED_RECORD = "duplicated-record",
   ID_NOT_PROVIDED = "id-not-provided",
   NOT_FOUND = "not-found",
 }

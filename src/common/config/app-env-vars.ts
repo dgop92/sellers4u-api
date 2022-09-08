@@ -23,4 +23,7 @@ export const APP_ENV_VARS = {
     ),
     logging: parseBoolOrThrow(getOsEnvOrDefault("TYPEORM_LOGGING", "false")),
   },
+  firebase: {
+    credentialsPath: getOsPath("GOOGLE_APPLICATION_CREDENTIALS"),
+  },
 };
