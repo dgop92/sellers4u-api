@@ -4,8 +4,8 @@ import {
   createTestLogger,
   WinstonLogger,
 } from "@common/logging/winston-logger";
-import { FirebaseUserRepository } from "@features/auth/infrastructure/users.firebase.repository";
-import { getAuthFirebaseClient } from "@features/auth/infrastructure/firebase-app";
+import { FirebaseUserRepository } from "@features/auth/infrastructure/firebase/users.firebase.repository";
+import { getAuthFirebaseClient } from "@features/auth/infrastructure/firebase/firebase-app";
 import { User } from "@features/auth/entities/user";
 import {
   deleteAllUsers,

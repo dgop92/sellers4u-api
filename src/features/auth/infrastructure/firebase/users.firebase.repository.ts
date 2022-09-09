@@ -1,13 +1,13 @@
-import {
-  IUserRepository,
-  UserCreateRepoData,
-} from "../ports/users.repository.definition";
 import { Auth as FirebaseAuth } from "firebase-admin/auth";
-import { User } from "../entities/user";
-import { UserSearchInput } from "../schema-types";
 import { AppLogger } from "@common/logging/logger";
 import { firebaseUserToDomain } from "./transformers";
 import { ErrorCode, RepositoryError } from "@common/errors";
+import {
+  IUserRepository,
+  UserCreateRepoData,
+} from "@features/auth/ports/users.repository.definition";
+import { User } from "@features/auth/entities/user";
+import { UserSearchInput } from "@features/auth/schema-types";
 
 const myLogger = AppLogger.getAppLogger().createFileLogger(__filename);
 

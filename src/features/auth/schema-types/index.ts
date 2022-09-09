@@ -3,5 +3,6 @@
  * Do not modify this file manually
  */
 
+export * from './app-user';
 export * from './auth';
 export * from './user';

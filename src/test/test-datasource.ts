@@ -1,7 +1,9 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-
 import { APP_ENV_VARS } from "@common/config/app-env-vars";
+import { authORMEntities } from "@features/auth/infrastructure/orm/entities";
+
+const allEntities = [...authORMEntities];
 
 export const TestDataSource = new DataSource({
   type: "postgres",
@@ -13,5 +15,6 @@ export const TestDataSource = new DataSource({
   logging: APP_ENV_VARS.db.logging,
   synchronize: APP_ENV_VARS.db.synchronize,
   migrations: APP_ENV_VARS.db.migrations,
+  entities: allEntities,
   name: "default",
 });

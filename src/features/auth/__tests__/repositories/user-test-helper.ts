@@ -7,6 +7,34 @@ export const TEST_EMAILS = {
   emailTest4: "test-email-4@example.com",
 };
 
+export const TEST_USERS = {
+  userTest1: {
+    email: TEST_EMAILS.emailTest1,
+    id: "G1d2tcEfOFYfcm8ZcXi9tZjN852",
+  },
+  userTest2: {
+    email: TEST_EMAILS.emailTest2,
+    id: "ffd2tcEfffYfgg8ZcXyytZuN853",
+  },
+  userTest3: {
+    email: TEST_EMAILS.emailTest3,
+    id: "mmmmtcnnnnYfgg8ZcXyytZua800",
+  },
+};
+
+export const TEST_APP_USERS = {
+  appUserTest1: {
+    firstName: "John",
+    lastName: "Doe",
+    userId: TEST_USERS.userTest1.id,
+  },
+  appUserTest2: {
+    firstName: "Juan",
+    lastName: "Williams",
+    userId: TEST_USERS.userTest2.id,
+  },
+};
+
 export async function deleteAllUsers(authFirebaseClient: FirebaseAuth) {
   const listUsersResult = await authFirebaseClient.listUsers(100);
   const uids = listUsersResult.users.map((userRecord) => userRecord.uid);

@@ -1,5 +1,8 @@
 import { APP_ENV_VARS } from "@common/config/app-env-vars";
 import { DataSource } from "typeorm";
+import { authORMEntities } from "@features/auth/infrastructure/orm/entities";
+
+const allEntities = [...authORMEntities];
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -11,5 +14,6 @@ export const AppDataSource = new DataSource({
   logging: APP_ENV_VARS.db.logging,
   synchronize: APP_ENV_VARS.db.synchronize,
   migrations: APP_ENV_VARS.db.migrations,
+  entities: allEntities,
   name: "default",
 });
