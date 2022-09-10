@@ -1,5 +1,5 @@
+import { User } from "@features/auth/entities/user";
 import { UserRecord } from "firebase-admin/auth";
-import { User } from "../entities/user";
 
 export function firebaseUserToDomain(firebaseUser: UserRecord): User {
   return {

@@ -7,12 +7,13 @@ import {
 import { FirebaseUserRepository } from "@features/auth/infrastructure/firebase/users.firebase.repository";
 import { getAuthFirebaseClient } from "@features/auth/infrastructure/firebase/firebase-app";
 import { User } from "@features/auth/entities/user";
-import {
-  deleteAllUsers,
-  RANDOM_USER_ID,
-  TEST_EMAILS,
-} from "./user-test-helper";
+
 import { ErrorCode, RepositoryError } from "@common/errors";
+import {
+  deleteAllFirebaseUsers,
+  RANDOM_USER_ID,
+} from "../mocks/firebase-test-helpers";
+import { TEST_EMAILS } from "../mocks/users-test-data";
 
 const logger = createTestLogger();
 const winstonLogger = new WinstonLogger(logger);
@@ -30,7 +31,7 @@ describe("firebase repository", () => {
 
   describe("Create", () => {
     beforeEach(async () => {
-      await deleteAllUsers(authFirebaseClient);
+      await deleteAllFirebaseUsers(authFirebaseClient);
       user1 = await firebaseUserRepository.create({
         email: TEST_EMAILS.emailTest1,
         password: "test-password",
@@ -70,7 +71,7 @@ describe("firebase repository", () => {
   });
   describe("Get One By", () => {
     beforeEach(async () => {
-      await deleteAllUsers(authFirebaseClient);
+      await deleteAllFirebaseUsers(authFirebaseClient);
       user1 = await firebaseUserRepository.create({
         email: TEST_EMAILS.emailTest1,
         password: "test-password",

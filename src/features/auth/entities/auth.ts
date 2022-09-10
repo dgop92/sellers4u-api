@@ -5,9 +5,7 @@ export const LoginInputSchema = Joi.object({
     email: Joi.string().max(200).required(),
     // Password must have at least 8 characters, an uppercase letter, a lowercase letter and a number
     password: Joi.string()
-      .pattern(
-        new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*d)[A-Za-zd$@$!%*?&]{8,100}$")
-      )
+      .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d$@$!%*?&-]{8,100}$/)
       .required(),
   }).required(),
 }).meta({ className: "LoginInput" });
