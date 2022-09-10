@@ -45,13 +45,13 @@ export class UserUseCase implements IUserUseCase {
         id: input.searchBy.id,
       });
       throw new ApplicationError(
-        "mailing-list with given id was not found",
+        "user with given id was not found",
         ErrorCode.NOT_FOUND
       );
     }
 
     myLogger.debug("user found, deleting", { id: input.searchBy.id });
-    return this.userRepository.delete(user);
+    this.userRepository.delete(user);
   }
 
   getOneBy(input: UserSearchInput): Promise<User | undefined> {

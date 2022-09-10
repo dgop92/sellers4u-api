@@ -23,7 +23,7 @@ export interface AppUserUpdateInput {
     firstName?: string;
     lastName?: string;
   };
-  searchBy?: {
+  searchBy: {
     id: number;
   };
 }

@@ -2,10 +2,7 @@ import { AppUser } from "@features/auth/entities/app-user";
 import { User } from "@features/auth/entities/user";
 import { AppUserEntity } from "./entities/app-user.orm";
 
-export function appUserEntityToDomain(
-  entity: AppUserEntity,
-  user?: User
-): AppUser {
+export function appUserEntityToDomain(entity: AppUserEntity): AppUser {
   return {
     id: entity.id,
     firstName: entity.firstName,
@@ -14,7 +11,6 @@ export function appUserEntityToDomain(
     updatedAt: entity.updatedAt,
     deletedAt: entity.deletedAt,
     userId: entity.firebaseUserId,
-    user,
   };
 }
 
@@ -26,8 +22,5 @@ export function appUserEntityFromDomain(appUser: AppUser): AppUserEntity {
   appUserEntity.createdAt = appUser.createdAt;
   appUserEntity.updatedAt = appUser.updatedAt;
   appUserEntity.deletedAt = appUser.deletedAt;
-  if (appUser.user) {
-    appUserEntity.firebaseUserId = appUser.user.id;
-  }
   return appUserEntity;
 }

@@ -1,12 +1,10 @@
 import Joi from "joi";
-import { User } from "./user";
 
 export interface AppUser {
   id: number;
   firstName: string;
   lastName: string;
   userId: string;
-  user?: User;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
@@ -29,10 +27,10 @@ export const AppUserCreateInputSchema = Joi.object({
 
 export const AppUserUpdateInputSchema = Joi.object({
   data: Joi.object({
-    firstName: Joi.string().max(200).optional(),
-    lastName: Joi.string().max(200).optional(),
+    firstName: Joi.string().max(120).optional(),
+    lastName: Joi.string().max(120).optional(),
   }).required(),
   searchBy: Joi.object({
     id: Joi.number().required(),
-  }).optional(),
+  }).required(),
 }).meta({ className: "AppUserUpdateInput" });
