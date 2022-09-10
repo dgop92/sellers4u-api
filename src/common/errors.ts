@@ -7,6 +7,7 @@ export enum ErrorCode {
   DUPLICATED_RECORD = "duplicated-record",
   ID_NOT_PROVIDED = "id-not-provided",
   NOT_FOUND = "not-found",
+  APPLICATION_INTEGRITY_ERROR = "application-integrity-error",
 }
 
 export interface BaseErrorParams {
