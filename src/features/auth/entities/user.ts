@@ -7,7 +7,7 @@ export interface User {
 
 export const UserSearchInputSchema = Joi.object({
   searchBy: Joi.object({
-    id: Joi.string().max(200).optional(),
+    id: Joi.string().min(1).max(128).optional(),
     email: Joi.string().email().max(200).optional(),
   }).optional(),
 }).meta({ className: "UserSearchInput" });

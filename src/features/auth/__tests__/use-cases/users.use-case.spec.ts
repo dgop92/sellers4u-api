@@ -13,7 +13,7 @@ import {
 } from "../mocks/firebase-test-helpers";
 import { UserUseCase } from "@features/auth/use-cases/users.use-case.";
 import { TEST_EMAILS } from "../mocks/users-test-data";
-import { InvalidInputError } from "@common/errors";
+import { ApplicationError, ErrorCode, InvalidInputError } from "@common/errors";
 
 const logger = createTestLogger();
 const winstonLogger = new WinstonLogger(logger);
@@ -56,59 +56,57 @@ describe("users use-case", () => {
       });
       expect(userRetrieved).toBeDefined();
     });
+    it("should get or create a user", async () => {
+      const email = TEST_EMAILS.emailTest3;
+      const userData = {
+        password: "secret-PASSWORD-1234",
+        email,
+      };
+      // Case: Creating a new user
+      const user1 = await userUseCase.getOrCreate({ data: userData });
+      expect(user1.email).toBe(userData.email);
+      const userRetrieved1 = await userUseCase.getOneBy({
+        searchBy: { email },
+      });
+      expect(userRetrieved1).toBeDefined();
+
+      // Case: Getting an existing user
+      const user2 = await userUseCase.getOrCreate({ data: userData });
+      expect(user2.email).toBe(userData.email);
+      const userRetrieved2 = await userUseCase.getOneBy({
+        searchBy: { email },
+      });
+      expect(userRetrieved2).toBeDefined();
+    });
   });
 
-  describe("Create Invalid Input", () => {
-    afterAll(async () => {
+  describe("Delete", () => {
+    let user1: User;
+
+    beforeEach(async () => {
       await deleteAllFirebaseUsers(authFirebaseClient);
+      user1 = await userUseCase.create({
+        data: {
+          email: TEST_EMAILS.emailTest1,
+          password: "secret-PASSWORD-1234",
+        },
+      });
     });
 
-    // invalid input test cases
-    it("should throw an error if email is not provided", async () => {
-      try {
-        await userUseCase.create({
-          data: { password: "secret-PASSWORD-1234" },
-        } as any);
-      } catch (error) {
-        expect(error).toBeInstanceOf(InvalidInputError);
-        if (error instanceof InvalidInputError) {
-          expect(error.errorParams.fieldName).toBe("email");
-        }
-      }
+    it("should delete an user", async () => {
+      await userUseCase.delete({ searchBy: { id: user1.id } });
+      const userRetrieved = await userUseCase.getOneBy({
+        searchBy: { id: user1.id },
+      });
+      expect(userRetrieved).toBeUndefined();
     });
-    it("should throw an error if password is not provided", async () => {
+    it("should throw an error if user is not found", async () => {
       try {
-        await userUseCase.create({
-          data: { email: TEST_EMAILS.emailTest2 },
-        } as any);
+        await userUseCase.delete({ searchBy: { id: RANDOM_USER_ID } });
       } catch (error) {
-        expect(error).toBeInstanceOf(InvalidInputError);
-        if (error instanceof InvalidInputError) {
-          expect(error.errorParams.fieldName).toBe("password");
-        }
-      }
-    });
-    it("should throw an error if email is not valid", async () => {
-      try {
-        await userUseCase.create({
-          data: { email: "invalid-email", password: "secret-PASSWORD-1234" },
-        });
-      } catch (error) {
-        expect(error).toBeInstanceOf(InvalidInputError);
-        if (error instanceof InvalidInputError) {
-          expect(error.errorParams.fieldName).toBe("email");
-        }
-      }
-    });
-    it("should throw an error if password is not strong enough", async () => {
-      try {
-        await userUseCase.create({
-          data: { email: TEST_EMAILS.emailTest2, password: "1234" },
-        });
-      } catch (error) {
-        expect(error).toBeInstanceOf(InvalidInputError);
-        if (error instanceof InvalidInputError) {
-          expect(error.errorParams.fieldName).toBe("password");
+        expect(error).toBeInstanceOf(ApplicationError);
+        if (error instanceof ApplicationError) {
+          expect(error.errorCode).toBe(ErrorCode.NOT_FOUND);
         }
       }
     });
@@ -155,11 +153,71 @@ describe("users use-case", () => {
       expect(user).toBeUndefined();
     });
   });
+});
+
+describe("users use-case invalid input", () => {
+  let userUseCase: UserUseCase;
+
+  beforeAll(async () => {
+    userUseCase = new UserUseCase(undefined!);
+  });
+
+  describe("Create Invalid Input", () => {
+    // invalid input test cases
+    it("should throw an error if email is not provided", async () => {
+      try {
+        await userUseCase.create({
+          data: { password: "secret-PASSWORD-1234" },
+        } as any);
+      } catch (error) {
+        expect(error).toBeInstanceOf(InvalidInputError);
+        if (error instanceof InvalidInputError) {
+          expect(error.errorParams.fieldName).toBe("email");
+        }
+      }
+    });
+
+    it("should throw an error if password is not provided", async () => {
+      try {
+        await userUseCase.create({
+          data: { email: TEST_EMAILS.emailTest2 },
+        } as any);
+      } catch (error) {
+        expect(error).toBeInstanceOf(InvalidInputError);
+        if (error instanceof InvalidInputError) {
+          expect(error.errorParams.fieldName).toBe("password");
+        }
+      }
+    });
+
+    it("should throw an error if email is not valid", async () => {
+      try {
+        await userUseCase.create({
+          data: { email: "invalid-email", password: "secret-PASSWORD-1234" },
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(InvalidInputError);
+        if (error instanceof InvalidInputError) {
+          expect(error.errorParams.fieldName).toBe("email");
+        }
+      }
+    });
+
+    it("should throw an error if password is not strong enough", async () => {
+      try {
+        await userUseCase.create({
+          data: { email: TEST_EMAILS.emailTest2, password: "1234" },
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(InvalidInputError);
+        if (error instanceof InvalidInputError) {
+          expect(error.errorParams.fieldName).toBe("password");
+        }
+      }
+    });
+  });
 
   describe("Get One By Invalid Input", () => {
-    afterAll(async () => {
-      await deleteAllFirebaseUsers(authFirebaseClient);
-    });
     // invalid input test cases
     it("should throw an error if email is not valid", async () => {
       try {

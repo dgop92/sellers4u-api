@@ -37,6 +37,12 @@ export class FirebaseUserRepository implements IUserRepository {
     }
   }
 
+  async delete(user: User): Promise<void> {
+    myLogger.debug("deleting user", { id: user.id });
+    await this.authFirebaseClient.deleteUser(user.id);
+    myLogger.debug("user deleted", { id: user.id });
+  }
+
   getOneBy(input: UserSearchInput): Promise<User | undefined> {
     const email = input.searchBy?.email;
     const id = input.searchBy?.id;

@@ -13,6 +13,7 @@ export function appUserEntityToDomain(
     createdAt: entity.createdAt,
     updatedAt: entity.updatedAt,
     deletedAt: entity.deletedAt,
+    userId: entity.firebaseUserId,
     user,
   };
 }

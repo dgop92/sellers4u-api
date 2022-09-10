@@ -34,7 +34,7 @@ describe("firebase repository", () => {
       await deleteAllFirebaseUsers(authFirebaseClient);
       user1 = await firebaseUserRepository.create({
         email: TEST_EMAILS.emailTest1,
-        password: "test-password",
+        password: "secret-PASSWORD-1234",
       });
     });
 
@@ -69,12 +69,13 @@ describe("firebase repository", () => {
       }
     });
   });
+
   describe("Get One By", () => {
     beforeEach(async () => {
       await deleteAllFirebaseUsers(authFirebaseClient);
       user1 = await firebaseUserRepository.create({
         email: TEST_EMAILS.emailTest1,
-        password: "test-password",
+        password: "secret-PASSWORD-1234",
       });
     });
     it("should get a user by id", async () => {
@@ -100,6 +101,23 @@ describe("firebase repository", () => {
     it("should not get a user by email", async () => {
       const user = await firebaseUserRepository.getOneBy({
         searchBy: { email: TEST_EMAILS.emailTest4 },
+      });
+      expect(user).toBeUndefined();
+    });
+  });
+
+  describe("Delete", () => {
+    beforeEach(async () => {
+      await deleteAllFirebaseUsers(authFirebaseClient);
+      user1 = await firebaseUserRepository.create({
+        email: TEST_EMAILS.emailTest1,
+        password: "secret-PASSWORD-1234",
+      });
+    });
+    it("should delete an user", async () => {
+      await firebaseUserRepository.delete(user1);
+      const user = await firebaseUserRepository.getOneBy({
+        searchBy: { id: user1.id },
       });
       expect(user).toBeUndefined();
     });

@@ -15,7 +15,7 @@ const logger = createTestLogger();
 const winstonLogger = new WinstonLogger(logger);
 AppLogger.getAppLogger().setLogger(winstonLogger);
 
-// NOTE: must use firstName because AppUser does not contain userId
+// Note userId is mock in order to not use firebase
 
 describe("app user repository", () => {
   let appUserRepository: AppUserRepository;
@@ -40,7 +40,7 @@ describe("app user repository", () => {
     it("should create an app user", async () => {
       const inputData = TEST_APP_USERS.appUserTest2;
       const appUser = await appUserRepository.create(inputData);
-      expect(appUser?.firstName).toBe(TEST_APP_USERS.appUserTest2.firstName);
+      expect(appUser).toMatchObject(TEST_APP_USERS.appUserTest2);
 
       const appUserRetrieved = await appUserRepository.getOneBy({
         searchBy: { userId: TEST_USERS.userTest2.id },
@@ -64,6 +64,7 @@ describe("app user repository", () => {
       }
     });
   });
+
   describe("Get One By", () => {
     let appUser1: AppUser;
 
@@ -77,7 +78,7 @@ describe("app user repository", () => {
         searchBy: { userId: TEST_APP_USERS.appUserTest1.userId },
       });
       expect(appUserRetrieved).toBeDefined();
-      expect(appUserRetrieved?.firstName).toBe(appUser1.firstName);
+      expect(appUserRetrieved?.userId).toBe(appUser1.userId);
     });
     it("should not get an app user by userId", async () => {
       const appUserRetrieved = await appUserRepository.getOneBy({
@@ -90,7 +91,7 @@ describe("app user repository", () => {
         searchBy: { id: appUser1.id },
       });
       expect(appUserRetrieved).toBeDefined();
-      expect(appUserRetrieved?.firstName).toBe(appUser1.firstName);
+      expect(appUserRetrieved?.userId).toBe(appUser1.userId);
     });
     it("should not get an app user by id", async () => {
       const appUserRetrieved = await appUserRepository.getOneBy({
