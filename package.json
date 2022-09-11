@@ -4,7 +4,8 @@
   "description": "",
   "main": "build/main/index.js",
   "scripts": {
-    "start": "node build/main/index.js",
+    "start": "node -r ./scripts/prod-setup.js dist/main/index.js",
+    "build": "tsc -p .",
     "schema-types": "ts-node -r tsconfig-paths/register ./scripts/create-schema-types.ts",
     "dev": "ts-node-dev -r ./scripts/dev-setup.ts --respawn src/main/index.ts",
     "test": "jest -c ./jest.unit.json --verbose --runInBand",
@@ -26,7 +27,7 @@
     "ts-node": "^10.8.1",
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.0.0",
-    "typescript": "^4.7.3"
+    "typescript": "^4.7.4"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.11",

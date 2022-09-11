@@ -1,7 +1,8 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": "./",
+    "rootDir": "./src",
+    "baseUrl": "./src",
     "outDir": "./dist",
     "esModuleInterop": true,
     "paths": {
@@ -10,7 +11,14 @@
       ],
       "@common/*": [
         "common/*"
-      ],
+      ]
     }
   },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "**/__tests__/**/*",
+    "src/test/*"
+  ]
 }
