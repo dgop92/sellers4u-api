@@ -3,17 +3,17 @@ import {
   createTestLogger,
   WinstonLogger,
 } from "@common/logging/winston-logger";
-import { FirebaseUserRepository } from "@features/auth/infrastructure/firebase/users.firebase.repository";
+import { FirebaseUserRepository } from "@features/auth/infrastructure/firebase/auth-user.firebase.repository";
 import { Auth as FirebaseAuth } from "firebase-admin/auth";
 import { getAuthFirebaseClient } from "@features/auth/infrastructure/firebase/firebase-app";
 import {
   deleteAllFirebaseUsers,
   RANDOM_USER_ID,
 } from "../mocks/firebase-test-helpers";
-import { AuthUserUseCase } from "@features/auth/use-cases/users.use-case.";
+import { AuthUserUseCase } from "@features/auth/use-cases/auth-user.use-case.";
 import { TEST_APP_USERS, TEST_EMAILS } from "../mocks/users-test-data";
 import { ApplicationError, ErrorCode, InvalidInputError } from "@common/errors";
-import { AppUserUseCase } from "@features/auth/use-cases/app-users.use-case";
+import { AppUserUseCase } from "@features/auth/use-cases/app-user.use-case";
 import { TestDBHelper } from "test/test-db-helper";
 import { AppUserRepository } from "@features/auth/infrastructure/orm/repositories/app-user.repository";
 import { UserServiceUseCase } from "@features/auth/use-cases/user-service.use-case";

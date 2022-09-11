@@ -5,8 +5,8 @@ import { ErrorCode, RepositoryError } from "@common/errors";
 import {
   IAuthUserRepository,
   AuthUserCreateRepoData,
-} from "@features/auth/ports/users.repository.definition";
-import { AuthUser } from "@features/auth/entities/user";
+} from "@features/auth/ports/auth-user.repository.definition";
+import { AuthUser } from "@features/auth/entities/auth-user";
 import { AuthUserSearchInput } from "@features/auth/schema-types";
 
 const myLogger = AppLogger.getAppLogger().createFileLogger(__filename);

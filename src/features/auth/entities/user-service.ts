@@ -1,5 +1,5 @@
 import { AppUser } from "./app-user";
-import { AuthUser } from "./user";
+import { AuthUser } from "./auth-user";
 
 export interface UserService {
   user: AuthUser;

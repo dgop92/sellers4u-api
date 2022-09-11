@@ -8,7 +8,7 @@ import { AppUserRepository } from "@features/auth/infrastructure/orm/repositorie
 import { TestDBHelper } from "test/test-db-helper";
 import { AppUser } from "@features/auth/entities/app-user";
 import { TEST_APP_USERS, TEST_USERS } from "../mocks/users-test-data";
-import { AppUserUseCase } from "@features/auth/use-cases/app-users.use-case";
+import { AppUserUseCase } from "@features/auth/use-cases/app-user.use-case";
 import { ApplicationError, ErrorCode, InvalidInputError } from "@common/errors";
 import { RANDOM_USER_ID } from "../mocks/firebase-test-helpers";
 
@@ -42,7 +42,7 @@ describe("app user use-case", () => {
       expect(appUser).toMatchObject(TEST_APP_USERS.appUserTest2);
 
       const appUserRetrieved = await appUserUseCase.getOneBy({
-        searchBy: { userId: TEST_USERS.userTest2.id },
+        searchBy: { userId: TEST_USERS.authUserTest2.id },
       });
       expect(appUserRetrieved).toBeDefined();
     });

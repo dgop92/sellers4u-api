@@ -7,7 +7,7 @@ import {
   UserServicCreateInput,
   UserServicLookUpInput,
 } from "../ports/user-service.use-case.definition";
-import { IAuthUserUseCase } from "../ports/users.use-case.definition";
+import { IAuthUserUseCase } from "../ports/auth-user.use-case.definition";
 
 const myLogger = AppLogger.getAppLogger().createFileLogger(__filename);
 

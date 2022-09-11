@@ -1,4 +1,4 @@
-import { AuthUser } from "../entities/user";
+import { AuthUser } from "../entities/auth-user";
 import { LoginInput } from "../schema-types";
 
 export interface IAuthUseCase {

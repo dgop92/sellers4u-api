@@ -1,4 +1,4 @@
-import { AuthUser } from "../entities/user";
+import { AuthUser } from "../entities/auth-user";
 import { AuthUserCreateInput, AuthUserSearchInput } from "../schema-types";
 
 export type AuthUserCreateRepoData = AuthUserCreateInput["data"];

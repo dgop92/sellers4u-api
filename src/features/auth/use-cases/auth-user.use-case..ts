@@ -6,12 +6,12 @@ import {
   AuthUser,
   AuthUserCreateInputSchema,
   AuthUserSearchInputSchema,
-} from "../entities/user";
-import { IAuthUserRepository } from "../ports/users.repository.definition";
+} from "../entities/auth-user";
+import { IAuthUserRepository } from "../ports/auth-user.repository.definition";
 import {
   IAuthUserUseCase,
   AuthUserLookUpField,
-} from "../ports/users.use-case.definition";
+} from "../ports/auth-user.use-case.definition";
 import { AuthUserCreateInput, AuthUserSearchInput } from "../schema-types";
 import { SearchByUidSchema } from "../utils";
 
@@ -53,7 +53,7 @@ export class AuthUserUseCase implements IAuthUserUseCase {
     }
 
     myLogger.debug("auth user found, deleting", { id: input.searchBy.id });
-    this.userRepository.delete(authUser);
+    await this.userRepository.delete(authUser);
   }
 
   getOneBy(input: AuthUserSearchInput): Promise<AuthUser | undefined> {

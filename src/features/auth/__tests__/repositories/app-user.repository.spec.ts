@@ -43,7 +43,7 @@ describe("app user repository", () => {
       expect(appUser).toMatchObject(TEST_APP_USERS.appUserTest2);
 
       const appUserRetrieved = await appUserRepository.getOneBy({
-        searchBy: { userId: TEST_USERS.userTest2.id },
+        searchBy: { userId: TEST_USERS.authUserTest2.id },
       });
       expect(appUserRetrieved).toBeDefined();
     });
@@ -51,7 +51,7 @@ describe("app user repository", () => {
       const inputData = {
         firstName: "Pedroski",
         lastName: "Tomski",
-        userId: TEST_USERS.userTest1.id,
+        userId: TEST_USERS.authUserTest1.id,
       };
       try {
         await appUserRepository.create(inputData);

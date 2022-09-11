@@ -6,15 +6,15 @@ export const TEST_EMAILS = {
 };
 
 export const TEST_USERS = {
-  userTest1: {
+  authUserTest1: {
     email: TEST_EMAILS.emailTest1,
     id: "G1d2tcEfOFYfcm8ZcXi9tZjN852",
   },
-  userTest2: {
+  authUserTest2: {
     email: TEST_EMAILS.emailTest2,
     id: "ffd2tcEfffYfgg8ZcXyytZuN853",
   },
-  userTest3: {
+  authUserTest3: {
     email: TEST_EMAILS.emailTest3,
     id: "mmmmtcnnnnYfgg8ZcXyytZua800",
   },
@@ -24,11 +24,11 @@ export const TEST_APP_USERS = {
   appUserTest1: {
     firstName: "John",
     lastName: "Doe",
-    userId: TEST_USERS.userTest1.id,
+    userId: TEST_USERS.authUserTest1.id,
   },
   appUserTest2: {
     firstName: "Juan",
     lastName: "Williams",
-    userId: TEST_USERS.userTest2.id,
+    userId: TEST_USERS.authUserTest2.id,
   },
 };
