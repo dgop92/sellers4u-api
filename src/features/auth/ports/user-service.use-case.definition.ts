@@ -3,7 +3,7 @@ import { AppUserCreateInput, UserCreateInput } from "../schema-types";
 
 export type UserServicCreateInput = {
   userData: UserCreateInput["data"];
-  appUserData: AppUserCreateInput["data"];
+  appUserData: Omit<AppUserCreateInput["data"], "userId">;
 };
 
 export type UserServicLookUpInput = {

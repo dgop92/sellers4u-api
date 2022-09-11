@@ -49,7 +49,7 @@ export class UserServiceUseCase implements IUserService {
     }
     myLogger.debug("user has no app user, creating one", { userId });
     const appUser = await this.appUserUseCase.create({
-      data: input.appUserData,
+      data: { ...input.appUserData, userId: userId },
     });
     myLogger.debug("app user created", { userId, appUserId: appUser.id });
     return {
