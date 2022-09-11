@@ -1,11 +1,11 @@
 import { ApplicationError, ErrorCode } from "@common/errors";
 import { AppLogger } from "@common/logging/logger";
-import { UserService } from "../entities/user-service";
+import { User } from "../entities/user";
 import { IAppUserUseCase } from "../ports/app-user.use-case.definition";
 import {
   IUserService,
-  UserServicCreateInput,
-  UserServicLookUpInput,
+  UserServiceCreateInput,
+  UserServiceLookUpInput,
 } from "../ports/user-service.use-case.definition";
 import { IAuthUserUseCase } from "../ports/auth-user.use-case.definition";
 
@@ -27,7 +27,7 @@ export class UserServiceUseCase implements IUserService {
    * @param input Auth user data and app user data
    * @returns The created auth user and app user
    */
-  async create(input: UserServicCreateInput): Promise<UserService> {
+  async create(input: UserServiceCreateInput): Promise<User> {
     myLogger.debug("creating or getting auth user");
     const authUser = await this.authUserUseCase.getOrCreate({
       data: input.authUserData,
@@ -55,7 +55,7 @@ export class UserServiceUseCase implements IUserService {
     });
     myLogger.debug("app user created", { userId, appUserId: appUser.id });
     return {
-      user: authUser,
+      authUser: authUser,
       appUser,
     };
   }
@@ -70,8 +70,8 @@ export class UserServiceUseCase implements IUserService {
    * @returns The auth user and its app user
    */
   async getOneByUserId(
-    input: UserServicLookUpInput
-  ): Promise<UserService | undefined> {
+    input: UserServiceLookUpInput
+  ): Promise<User | undefined> {
     const userId = input.searchBy.id;
     myLogger.debug("getting auth user by user id");
     const authUser = await this.authUserUseCase.getOneBy({
@@ -92,7 +92,7 @@ export class UserServiceUseCase implements IUserService {
         appUserId: appUser.id,
       });
       return {
-        user: authUser,
+        authUser: authUser,
         appUser,
       };
     }
@@ -119,11 +119,11 @@ export class UserServiceUseCase implements IUserService {
    * @param input userId
    * @returns void
    */
-  async delete(input: UserServicLookUpInput): Promise<void> {
+  async delete(input: UserServiceLookUpInput): Promise<void> {
     const userId = input.searchBy.id;
     myLogger.debug("trying to get auth user with user id");
-    const users = await this.getOneByUserId(input);
-    if (!users) {
+    const user = await this.getOneByUserId(input);
+    if (!user) {
       throw new ApplicationError(
         "auth user and app user with given user id not found",
         ErrorCode.NOT_FOUND
@@ -131,7 +131,7 @@ export class UserServiceUseCase implements IUserService {
     }
     myLogger.debug("deleting auth user and app user", { userId });
     await this.authUserUseCase.delete({ searchBy: { id: userId } });
-    await this.appUserUseCase.delete({ searchBy: { id: users.appUser.id } });
+    await this.appUserUseCase.delete({ searchBy: { id: user.appUser.id } });
     myLogger.debug("auth user and app user deleted", { userId });
   }
 }

@@ -1,21 +1,19 @@
-import { UserService } from "../entities/user-service";
+import { User } from "../entities/user";
 import { AppUserCreateInput, AuthUserCreateInput } from "../schema-types";
 
-export type UserServicCreateInput = {
+export type UserServiceCreateInput = {
   authUserData: AuthUserCreateInput["data"];
   appUserData: Omit<AppUserCreateInput["data"], "userId">;
 };
 
-export type UserServicLookUpInput = {
+export type UserServiceLookUpInput = {
   searchBy: {
     id: string;
   };
 };
 
 export interface IUserService {
-  create(input: UserServicCreateInput): Promise<UserService>;
-  getOneByUserId(
-    input: UserServicLookUpInput
-  ): Promise<UserService | undefined>;
-  delete(input: UserServicLookUpInput): Promise<void>;
+  create(input: UserServiceCreateInput): Promise<User>;
+  getOneByUserId(input: UserServiceLookUpInput): Promise<User | undefined>;
+  delete(input: UserServiceLookUpInput): Promise<void>;
 }

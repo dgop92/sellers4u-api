@@ -17,7 +17,7 @@ import { AppUserUseCase } from "@features/auth/use-cases/app-user.use-case";
 import { TestDBHelper } from "test/test-db-helper";
 import { AppUserRepository } from "@features/auth/infrastructure/orm/repositories/app-user.repository";
 import { UserServiceUseCase } from "@features/auth/use-cases/user-service.use-case";
-import { UserService } from "@features/auth/entities/user-service";
+import { User } from "@features/auth/entities/user";
 
 const logger = createTestLogger();
 const winstonLogger = new WinstonLogger(logger);
@@ -68,22 +68,20 @@ describe("user service use-case", () => {
     });
 
     it("should create a user service", async () => {
-      const userService = await userServiceUseCase.create({
+      const user = await userServiceUseCase.create({
         authUserData: {
           email: TEST_EMAILS.emailTest2,
           password: "secret-PASSWORD-1234",
         },
         appUserData: TEST_APP_USERS.appUserTest2,
       });
-      expect(userService.user.email).toBe(TEST_EMAILS.emailTest2);
-      expect(userService.appUser.firstName).toBe(
+      expect(user.authUser.email).toBe(TEST_EMAILS.emailTest2);
+      expect(user.appUser.firstName).toBe(
         TEST_APP_USERS.appUserTest2.firstName
       );
-      expect(userService.appUser.lastName).toBe(
-        TEST_APP_USERS.appUserTest2.lastName
-      );
+      expect(user.appUser.lastName).toBe(TEST_APP_USERS.appUserTest2.lastName);
       const userServiceRetrieved = await userServiceUseCase.getOneByUserId({
-        searchBy: { id: userService.user.id },
+        searchBy: { id: user.authUser.id },
       });
       expect(userServiceRetrieved).toBeDefined();
     });
@@ -111,24 +109,24 @@ describe("user service use-case", () => {
           password: "secret-PASSWORD-1234",
         },
       });
-      const userService = await userServiceUseCase.create({
+      const user = await userServiceUseCase.create({
         authUserData: {
           email: TEST_EMAILS.emailTest3,
           password: "secret-PASSWORD-1234",
         },
         appUserData: TEST_APP_USERS.appUserTest2,
       });
-      expect(userService.user.email).toBe(TEST_EMAILS.emailTest3);
+      expect(user.authUser.email).toBe(TEST_EMAILS.emailTest3);
     });
   });
 
   describe("Get One By", () => {
-    let userService1: UserService;
+    let user1: User;
 
     beforeEach(async () => {
       await deleteAllFirebaseUsers(authFirebaseClient);
       await TestDBHelper.instance.clear();
-      userService1 = await userServiceUseCase.create({
+      user1 = await userServiceUseCase.create({
         authUserData: {
           email: TEST_EMAILS.emailTest1,
           password: "secret-PASSWORD-1234",
@@ -140,18 +138,18 @@ describe("user service use-case", () => {
       });
     });
 
-    it("should get a user service", async () => {
-      const userServiceRetrieved = await userServiceUseCase.getOneByUserId({
-        searchBy: { id: userService1.user.id },
+    it("should get a user", async () => {
+      const userRetrieved = await userServiceUseCase.getOneByUserId({
+        searchBy: { id: user1.authUser.id },
       });
-      expect(userServiceRetrieved).toBeDefined();
-      expect(userServiceRetrieved?.user.id).toBe(userService1.user.id);
+      expect(userRetrieved).toBeDefined();
+      expect(userRetrieved?.authUser.id).toBe(user1.authUser.id);
     });
     it("should not get a user service", async () => {
-      const userServiceRetrieved = await userServiceUseCase.getOneByUserId({
+      const userRetrieved = await userServiceUseCase.getOneByUserId({
         searchBy: { id: RANDOM_USER_ID },
       });
-      expect(userServiceRetrieved).toBeUndefined();
+      expect(userRetrieved).toBeUndefined();
     });
     it("should throw integrity error if one of the users are not found", async () => {
       const user = await authUserUseCase.create({
@@ -174,12 +172,12 @@ describe("user service use-case", () => {
   });
 
   describe("Delete", () => {
-    let userService1: UserService;
+    let user: User;
 
     beforeEach(async () => {
       await deleteAllFirebaseUsers(authFirebaseClient);
       await TestDBHelper.instance.clear();
-      userService1 = await userServiceUseCase.create({
+      user = await userServiceUseCase.create({
         authUserData: {
           email: TEST_EMAILS.emailTest1,
           password: "secret-PASSWORD-1234",
@@ -193,10 +191,10 @@ describe("user service use-case", () => {
 
     it("should delete a user service", async () => {
       await userServiceUseCase.delete({
-        searchBy: { id: userService1.user.id },
+        searchBy: { id: user.authUser.id },
       });
       const userServiceRetrieved = await userServiceUseCase.getOneByUserId({
-        searchBy: { id: userService1.user.id },
+        searchBy: { id: user.authUser.id },
       });
       expect(userServiceRetrieved).toBeUndefined();
     });
