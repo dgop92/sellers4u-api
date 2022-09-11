@@ -1,10 +1,10 @@
-import { User } from "../entities/user";
-import { UserCreateInput, UserSearchInput } from "../schema-types";
+import { AuthUser } from "../entities/user";
+import { AuthUserCreateInput, AuthUserSearchInput } from "../schema-types";
 
-export type UserCreateRepoData = UserCreateInput["data"];
+export type AuthUserCreateRepoData = AuthUserCreateInput["data"];
 
-export interface IUserRepository {
-  create(input: UserCreateRepoData): Promise<User>;
-  delete(user: User): Promise<void>;
-  getOneBy(input: UserSearchInput): Promise<User | undefined>;
+export interface IAuthUserRepository {
+  create(input: AuthUserCreateRepoData): Promise<AuthUser>;
+  delete(user: AuthUser): Promise<void>;
+  getOneBy(input: AuthUserSearchInput): Promise<AuthUser | undefined>;
 }

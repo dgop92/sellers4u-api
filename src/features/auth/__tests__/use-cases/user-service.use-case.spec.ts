@@ -6,12 +6,11 @@ import {
 import { FirebaseUserRepository } from "@features/auth/infrastructure/firebase/users.firebase.repository";
 import { Auth as FirebaseAuth } from "firebase-admin/auth";
 import { getAuthFirebaseClient } from "@features/auth/infrastructure/firebase/firebase-app";
-import { User } from "@features/auth/entities/user";
 import {
   deleteAllFirebaseUsers,
   RANDOM_USER_ID,
 } from "../mocks/firebase-test-helpers";
-import { UserUseCase } from "@features/auth/use-cases/users.use-case.";
+import { AuthUserUseCase } from "@features/auth/use-cases/users.use-case.";
 import { TEST_APP_USERS, TEST_EMAILS } from "../mocks/users-test-data";
 import { ApplicationError, ErrorCode, InvalidInputError } from "@common/errors";
 import { AppUserUseCase } from "@features/auth/use-cases/app-users.use-case";
@@ -25,7 +24,7 @@ const winstonLogger = new WinstonLogger(logger);
 AppLogger.getAppLogger().setLogger(winstonLogger);
 
 describe("user service use-case", () => {
-  let userUseCase: UserUseCase;
+  let authUserUseCase: AuthUserUseCase;
   let appUserUseCase: AppUserUseCase;
   let userServiceUseCase: UserServiceUseCase;
   let authFirebaseClient: FirebaseAuth;
@@ -37,12 +36,15 @@ describe("user service use-case", () => {
     const firebaseUserRepository = new FirebaseUserRepository(
       authFirebaseClient
     );
-    userUseCase = new UserUseCase(firebaseUserRepository);
+    authUserUseCase = new AuthUserUseCase(firebaseUserRepository);
     const appUserRepository = new AppUserRepository(
       TestDBHelper.instance.datasource
     );
     appUserUseCase = new AppUserUseCase(appUserRepository);
-    userServiceUseCase = new UserServiceUseCase(userUseCase, appUserUseCase);
+    userServiceUseCase = new UserServiceUseCase(
+      authUserUseCase,
+      appUserUseCase
+    );
   });
 
   afterAll(async () => {
@@ -54,7 +56,7 @@ describe("user service use-case", () => {
       await deleteAllFirebaseUsers(authFirebaseClient);
       await TestDBHelper.instance.clear();
       await userServiceUseCase.create({
-        userData: {
+        authUserData: {
           email: TEST_EMAILS.emailTest1,
           password: "secret-PASSWORD-1234",
         },
@@ -67,7 +69,7 @@ describe("user service use-case", () => {
 
     it("should create a user service", async () => {
       const userService = await userServiceUseCase.create({
-        userData: {
+        authUserData: {
           email: TEST_EMAILS.emailTest2,
           password: "secret-PASSWORD-1234",
         },
@@ -88,7 +90,7 @@ describe("user service use-case", () => {
     it("should throw an error if email is already in use", async () => {
       try {
         await userServiceUseCase.create({
-          userData: {
+          authUserData: {
             email: TEST_EMAILS.emailTest1,
             password: "secret-PASSWORD-1234",
           },
@@ -102,15 +104,15 @@ describe("user service use-case", () => {
         }
       }
     });
-    it("should link user to app user", async () => {
-      await userUseCase.create({
+    it("should link auth user to app user", async () => {
+      await authUserUseCase.create({
         data: {
           email: TEST_EMAILS.emailTest3,
           password: "secret-PASSWORD-1234",
         },
       });
       const userService = await userServiceUseCase.create({
-        userData: {
+        authUserData: {
           email: TEST_EMAILS.emailTest3,
           password: "secret-PASSWORD-1234",
         },
@@ -127,7 +129,7 @@ describe("user service use-case", () => {
       await deleteAllFirebaseUsers(authFirebaseClient);
       await TestDBHelper.instance.clear();
       userService1 = await userServiceUseCase.create({
-        userData: {
+        authUserData: {
           email: TEST_EMAILS.emailTest1,
           password: "secret-PASSWORD-1234",
         },
@@ -151,8 +153,8 @@ describe("user service use-case", () => {
       });
       expect(userServiceRetrieved).toBeUndefined();
     });
-    it("should throw integrity error if one of the user are not found", async () => {
-      const user = await userUseCase.create({
+    it("should throw integrity error if one of the users are not found", async () => {
+      const user = await authUserUseCase.create({
         data: {
           email: TEST_EMAILS.emailTest3,
           password: "secret-PASSWORD-1234",
@@ -178,7 +180,7 @@ describe("user service use-case", () => {
       await deleteAllFirebaseUsers(authFirebaseClient);
       await TestDBHelper.instance.clear();
       userService1 = await userServiceUseCase.create({
-        userData: {
+        authUserData: {
           email: TEST_EMAILS.emailTest1,
           password: "secret-PASSWORD-1234",
         },

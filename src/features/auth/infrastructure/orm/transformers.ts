@@ -1,5 +1,4 @@
 import { AppUser } from "@features/auth/entities/app-user";
-import { User } from "@features/auth/entities/user";
 import { AppUserEntity } from "./entities/app-user.orm";
 
 export function appUserEntityToDomain(entity: AppUserEntity): AppUser {

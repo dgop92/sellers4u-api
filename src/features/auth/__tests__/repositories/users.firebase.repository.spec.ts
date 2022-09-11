@@ -6,7 +6,7 @@ import {
 } from "@common/logging/winston-logger";
 import { FirebaseUserRepository } from "@features/auth/infrastructure/firebase/users.firebase.repository";
 import { getAuthFirebaseClient } from "@features/auth/infrastructure/firebase/firebase-app";
-import { User } from "@features/auth/entities/user";
+import { AuthUser } from "@features/auth/entities/user";
 
 import { ErrorCode, RepositoryError } from "@common/errors";
 import {
@@ -22,7 +22,7 @@ AppLogger.getAppLogger().setLogger(winstonLogger);
 describe("firebase repository", () => {
   let authFirebaseClient: FirebaseAuth;
   let firebaseUserRepository: FirebaseUserRepository;
-  let user1: User;
+  let authUser1: AuthUser;
 
   beforeAll(async () => {
     authFirebaseClient = getAuthFirebaseClient();
@@ -32,7 +32,7 @@ describe("firebase repository", () => {
   describe("Create", () => {
     beforeEach(async () => {
       await deleteAllFirebaseUsers(authFirebaseClient);
-      user1 = await firebaseUserRepository.create({
+      authUser1 = await firebaseUserRepository.create({
         email: TEST_EMAILS.emailTest1,
         password: "secret-PASSWORD-1234",
       });
@@ -73,17 +73,17 @@ describe("firebase repository", () => {
   describe("Get One By", () => {
     beforeEach(async () => {
       await deleteAllFirebaseUsers(authFirebaseClient);
-      user1 = await firebaseUserRepository.create({
+      authUser1 = await firebaseUserRepository.create({
         email: TEST_EMAILS.emailTest1,
         password: "secret-PASSWORD-1234",
       });
     });
     it("should get a user by id", async () => {
       const user = await firebaseUserRepository.getOneBy({
-        searchBy: { id: user1.id },
+        searchBy: { id: authUser1.id },
       });
       expect(user).toBeDefined();
-      expect(user?.id).toBe(user1.id);
+      expect(user?.id).toBe(authUser1.id);
     });
     it("should not get a user by id", async () => {
       const user = await firebaseUserRepository.getOneBy({
@@ -93,10 +93,10 @@ describe("firebase repository", () => {
     });
     it("should get a user by email", async () => {
       const user = await firebaseUserRepository.getOneBy({
-        searchBy: { email: user1.email },
+        searchBy: { email: authUser1.email },
       });
       expect(user).toBeDefined();
-      expect(user?.email).toBe(user1.email);
+      expect(user?.email).toBe(authUser1.email);
     });
     it("should not get a user by email", async () => {
       const user = await firebaseUserRepository.getOneBy({
@@ -109,15 +109,15 @@ describe("firebase repository", () => {
   describe("Delete", () => {
     beforeEach(async () => {
       await deleteAllFirebaseUsers(authFirebaseClient);
-      user1 = await firebaseUserRepository.create({
+      authUser1 = await firebaseUserRepository.create({
         email: TEST_EMAILS.emailTest1,
         password: "secret-PASSWORD-1234",
       });
     });
     it("should delete an user", async () => {
-      await firebaseUserRepository.delete(user1);
+      await firebaseUserRepository.delete(authUser1);
       const user = await firebaseUserRepository.getOneBy({
-        searchBy: { id: user1.id },
+        searchBy: { id: authUser1.id },
       });
       expect(user).toBeUndefined();
     });

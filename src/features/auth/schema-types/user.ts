@@ -3,14 +3,14 @@
  * Do not modify this file manually
  */
 
-export interface UserCreateInput {
+export interface AuthUserCreateInput {
   data: {
     email: string;
     password: string;
   };
 }
 
-export interface UserSearchInput {
+export interface AuthUserSearchInput {
   searchBy?: {
     email?: string;
     id?: string;

@@ -1,15 +1,15 @@
-import { User } from "../entities/user";
-import { UserCreateInput, UserSearchInput } from "../schema-types";
+import { AuthUser } from "../entities/user";
+import { AuthUserCreateInput, AuthUserSearchInput } from "../schema-types";
 
-export type UserLookUpField = {
+export type AuthUserLookUpField = {
   searchBy: {
     id: string;
   };
 };
 
-export interface IUserUseCase {
-  create(input: UserCreateInput): Promise<User>;
-  getOneBy(input: UserSearchInput): Promise<User | undefined>;
-  delete(input: UserLookUpField): Promise<void>;
-  getOrCreate(input: UserCreateInput): Promise<User>;
+export interface IAuthUserUseCase {
+  create(input: AuthUserCreateInput): Promise<AuthUser>;
+  getOneBy(input: AuthUserSearchInput): Promise<AuthUser | undefined>;
+  delete(input: AuthUserLookUpField): Promise<void>;
+  getOrCreate(input: AuthUserCreateInput): Promise<AuthUser>;
 }

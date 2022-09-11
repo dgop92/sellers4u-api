@@ -1,8 +1,8 @@
 import { UserService } from "../entities/user-service";
-import { AppUserCreateInput, UserCreateInput } from "../schema-types";
+import { AppUserCreateInput, AuthUserCreateInput } from "../schema-types";
 
 export type UserServicCreateInput = {
-  userData: UserCreateInput["data"];
+  authUserData: AuthUserCreateInput["data"];
   appUserData: Omit<AppUserCreateInput["data"], "userId">;
 };
 

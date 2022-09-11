@@ -6,12 +6,12 @@ import {
 import { FirebaseUserRepository } from "@features/auth/infrastructure/firebase/users.firebase.repository";
 import { Auth as FirebaseAuth } from "firebase-admin/auth";
 import { getAuthFirebaseClient } from "@features/auth/infrastructure/firebase/firebase-app";
-import { User } from "@features/auth/entities/user";
+import { AuthUser } from "@features/auth/entities/user";
 import {
   deleteAllFirebaseUsers,
   RANDOM_USER_ID,
 } from "../mocks/firebase-test-helpers";
-import { UserUseCase } from "@features/auth/use-cases/users.use-case.";
+import { AuthUserUseCase } from "@features/auth/use-cases/users.use-case.";
 import { TEST_EMAILS } from "../mocks/users-test-data";
 import { ApplicationError, ErrorCode, InvalidInputError } from "@common/errors";
 
@@ -20,7 +20,7 @@ const winstonLogger = new WinstonLogger(logger);
 AppLogger.getAppLogger().setLogger(winstonLogger);
 
 describe("users use-case", () => {
-  let userUseCase: UserUseCase;
+  let authUserUseCase: AuthUserUseCase;
   let authFirebaseClient: FirebaseAuth;
 
   beforeAll(async () => {
@@ -28,13 +28,13 @@ describe("users use-case", () => {
     const firebaseUserRepository = new FirebaseUserRepository(
       authFirebaseClient
     );
-    userUseCase = new UserUseCase(firebaseUserRepository);
+    authUserUseCase = new AuthUserUseCase(firebaseUserRepository);
   });
 
   describe("Create", () => {
     beforeEach(async () => {
       await deleteAllFirebaseUsers(authFirebaseClient);
-      await userUseCase.create({
+      await authUserUseCase.create({
         data: {
           email: TEST_EMAILS.emailTest1,
           password: "secret-PASSWORD-1234",
@@ -48,10 +48,10 @@ describe("users use-case", () => {
         password: "secret-PASSWORD-1234",
         email,
       };
-      const user = await userUseCase.create({ data: userData });
+      const user = await authUserUseCase.create({ data: userData });
       expect(user.email).toBe(userData.email);
 
-      const userRetrieved = await userUseCase.getOneBy({
+      const userRetrieved = await authUserUseCase.getOneBy({
         searchBy: { email },
       });
       expect(userRetrieved).toBeDefined();
@@ -63,17 +63,17 @@ describe("users use-case", () => {
         email,
       };
       // Case: Creating a new user
-      const user1 = await userUseCase.getOrCreate({ data: userData });
+      const user1 = await authUserUseCase.getOrCreate({ data: userData });
       expect(user1.email).toBe(userData.email);
-      const userRetrieved1 = await userUseCase.getOneBy({
+      const userRetrieved1 = await authUserUseCase.getOneBy({
         searchBy: { email },
       });
       expect(userRetrieved1).toBeDefined();
 
       // Case: Getting an existing user
-      const user2 = await userUseCase.getOrCreate({ data: userData });
+      const user2 = await authUserUseCase.getOrCreate({ data: userData });
       expect(user2.email).toBe(userData.email);
-      const userRetrieved2 = await userUseCase.getOneBy({
+      const userRetrieved2 = await authUserUseCase.getOneBy({
         searchBy: { email },
       });
       expect(userRetrieved2).toBeDefined();
@@ -81,11 +81,11 @@ describe("users use-case", () => {
   });
 
   describe("Delete", () => {
-    let user1: User;
+    let authUser1: AuthUser;
 
     beforeEach(async () => {
       await deleteAllFirebaseUsers(authFirebaseClient);
-      user1 = await userUseCase.create({
+      authUser1 = await authUserUseCase.create({
         data: {
           email: TEST_EMAILS.emailTest1,
           password: "secret-PASSWORD-1234",
@@ -94,15 +94,15 @@ describe("users use-case", () => {
     });
 
     it("should delete an user", async () => {
-      await userUseCase.delete({ searchBy: { id: user1.id } });
-      const userRetrieved = await userUseCase.getOneBy({
-        searchBy: { id: user1.id },
+      await authUserUseCase.delete({ searchBy: { id: authUser1.id } });
+      const userRetrieved = await authUserUseCase.getOneBy({
+        searchBy: { id: authUser1.id },
       });
       expect(userRetrieved).toBeUndefined();
     });
     it("should throw an error if user is not found", async () => {
       try {
-        await userUseCase.delete({ searchBy: { id: RANDOM_USER_ID } });
+        await authUserUseCase.delete({ searchBy: { id: RANDOM_USER_ID } });
       } catch (error) {
         expect(error).toBeInstanceOf(ApplicationError);
         if (error instanceof ApplicationError) {
@@ -113,11 +113,11 @@ describe("users use-case", () => {
   });
 
   describe("Get One By", () => {
-    let user1: User;
+    let authUser1: AuthUser;
 
     beforeEach(async () => {
       await deleteAllFirebaseUsers(authFirebaseClient);
-      user1 = await userUseCase.create({
+      authUser1 = await authUserUseCase.create({
         data: {
           email: TEST_EMAILS.emailTest1,
           password: "secret-PASSWORD-1234",
@@ -127,27 +127,27 @@ describe("users use-case", () => {
 
     // positive test cases
     it("should get a user by email", async () => {
-      const user = await userUseCase.getOneBy({
+      const user = await authUserUseCase.getOneBy({
         searchBy: { email: TEST_EMAILS.emailTest1 },
       });
       expect(user).toBeDefined();
       expect(user?.email).toBe(TEST_EMAILS.emailTest1);
     });
     it("should get a user by id", async () => {
-      const user = await userUseCase.getOneBy({
-        searchBy: { id: user1.id },
+      const user = await authUserUseCase.getOneBy({
+        searchBy: { id: authUser1.id },
       });
       expect(user).toBeDefined();
       expect(user?.email).toBe(TEST_EMAILS.emailTest1);
     });
     it("should not get a user by email", async () => {
-      const user = await userUseCase.getOneBy({
+      const user = await authUserUseCase.getOneBy({
         searchBy: { email: "non-existing-email@gmail.com" },
       });
       expect(user).toBeUndefined();
     });
     it("should not get a user by id", async () => {
-      const user = await userUseCase.getOneBy({
+      const user = await authUserUseCase.getOneBy({
         searchBy: { id: RANDOM_USER_ID },
       });
       expect(user).toBeUndefined();
@@ -156,17 +156,17 @@ describe("users use-case", () => {
 });
 
 describe("users use-case invalid input", () => {
-  let userUseCase: UserUseCase;
+  let authUserUseCase: AuthUserUseCase;
 
   beforeAll(async () => {
-    userUseCase = new UserUseCase(undefined!);
+    authUserUseCase = new AuthUserUseCase(undefined!);
   });
 
   describe("Create Invalid Input", () => {
     // invalid input test cases
     it("should throw an error if email is not provided", async () => {
       try {
-        await userUseCase.create({
+        await authUserUseCase.create({
           data: { password: "secret-PASSWORD-1234" },
         } as any);
       } catch (error) {
@@ -179,7 +179,7 @@ describe("users use-case invalid input", () => {
 
     it("should throw an error if password is not provided", async () => {
       try {
-        await userUseCase.create({
+        await authUserUseCase.create({
           data: { email: TEST_EMAILS.emailTest2 },
         } as any);
       } catch (error) {
@@ -192,7 +192,7 @@ describe("users use-case invalid input", () => {
 
     it("should throw an error if email is not valid", async () => {
       try {
-        await userUseCase.create({
+        await authUserUseCase.create({
           data: { email: "invalid-email", password: "secret-PASSWORD-1234" },
         });
       } catch (error) {
@@ -205,7 +205,7 @@ describe("users use-case invalid input", () => {
 
     it("should throw an error if password is not strong enough", async () => {
       try {
-        await userUseCase.create({
+        await authUserUseCase.create({
           data: { email: TEST_EMAILS.emailTest2, password: "1234" },
         });
       } catch (error) {
@@ -221,7 +221,7 @@ describe("users use-case invalid input", () => {
     // invalid input test cases
     it("should throw an error if email is not valid", async () => {
       try {
-        await userUseCase.getOneBy({
+        await authUserUseCase.getOneBy({
           searchBy: { email: "invalid-email" },
         });
       } catch (error) {

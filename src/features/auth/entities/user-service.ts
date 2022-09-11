@@ -1,7 +1,7 @@
 import { AppUser } from "./app-user";
-import { User } from "./user";
+import { AuthUser } from "./user";
 
 export interface UserService {
-  user: User;
+  user: AuthUser;
   appUser: AppUser;
 }
