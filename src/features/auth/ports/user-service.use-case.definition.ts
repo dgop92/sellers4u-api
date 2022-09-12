@@ -12,7 +12,7 @@ export type UserServiceLookUpInput = {
   };
 };
 
-export interface IUserService {
+export interface IUserServiceUseCase {
   create(input: UserServiceCreateInput): Promise<User>;
   getOneByUserId(input: UserServiceLookUpInput): Promise<User | undefined>;
   delete(input: UserServiceLookUpInput): Promise<void>;

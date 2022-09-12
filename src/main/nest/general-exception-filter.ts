@@ -17,6 +17,8 @@ function getStatusCodeFromErrorCode(errorCode: ErrorCode) {
       return HttpStatus.BAD_REQUEST;
     case ErrorCode.NOT_FOUND:
       return HttpStatus.NOT_FOUND;
+    case ErrorCode.DUPLICATED_RECORD:
+      return HttpStatus.CONFLICT;
     default:
       return HttpStatus.INTERNAL_SERVER_ERROR;
   }

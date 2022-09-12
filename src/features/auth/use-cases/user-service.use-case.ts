@@ -3,7 +3,7 @@ import { AppLogger } from "@common/logging/logger";
 import { User } from "../entities/user";
 import { IAppUserUseCase } from "../ports/app-user.use-case.definition";
 import {
-  IUserService,
+  IUserServiceUseCase,
   UserServiceCreateInput,
   UserServiceLookUpInput,
 } from "../ports/user-service.use-case.definition";
@@ -11,7 +11,7 @@ import { IAuthUserUseCase } from "../ports/auth-user.use-case.definition";
 
 const myLogger = AppLogger.getAppLogger().createFileLogger(__filename);
 
-export class UserServiceUseCase implements IUserService {
+export class UserServiceUseCase implements IUserServiceUseCase {
   constructor(
     private readonly authUserUseCase: IAuthUserUseCase,
     private readonly appUserUseCase: IAppUserUseCase
