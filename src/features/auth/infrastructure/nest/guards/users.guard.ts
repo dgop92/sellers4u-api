@@ -68,7 +68,7 @@ export class AuthUserGuard implements CanActivate {
       const tokenPayload = await authFirebaseClient.verifyIdToken(token);
       myLogger.debug("token verified", { userId: tokenPayload.uid });
 
-      req.authUser = {
+      req.authuser = {
         id: tokenPayload.uid,
         email: tokenPayload.email!,
       };

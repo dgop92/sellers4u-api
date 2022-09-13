@@ -26,6 +26,6 @@ export const myUserServiceFactory = (
   }
 
   return {
-    userService: userServiceUseCase,
+    userServiceUseCase,
   };
 };
