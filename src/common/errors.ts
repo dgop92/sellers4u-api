@@ -7,6 +7,7 @@ export enum ErrorCode {
   DUPLICATED_RECORD = "duplicated-record",
   ID_NOT_PROVIDED = "id-not-provided",
   NOT_FOUND = "not-found",
+  UNAUTHORIZED = "unauthorized",
   APPLICATION_INTEGRITY_ERROR = "application-integrity-error",
 }
 

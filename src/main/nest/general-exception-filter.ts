@@ -19,6 +19,8 @@ function getStatusCodeFromErrorCode(errorCode: ErrorCode) {
       return HttpStatus.NOT_FOUND;
     case ErrorCode.DUPLICATED_RECORD:
       return HttpStatus.CONFLICT;
+    case ErrorCode.UNAUTHORIZED:
+      return HttpStatus.UNAUTHORIZED;
     default:
       return HttpStatus.INTERNAL_SERVER_ERROR;
   }

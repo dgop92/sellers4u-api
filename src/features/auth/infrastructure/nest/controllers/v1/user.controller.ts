@@ -1,9 +1,12 @@
+import { User } from "@features/auth/entities/user";
 import { myUserServiceFactory } from "@features/auth/factories/user-service-factory";
 import {
   IUserServiceUseCase,
   UserServiceCreateInput,
 } from "@features/auth/ports/user-service.use-case.definition";
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Post, Get, UseGuards } from "@nestjs/common";
+import { GetUser } from "../../custom-decorators";
+import { UserGuard } from "../../guards/users.guard";
 
 type CreateUserRequest = UserServiceCreateInput["appUserData"] &
   UserServiceCreateInput["authUserData"];
@@ -31,5 +34,11 @@ export class UserControllerV1 {
         password: data.password,
       },
     });
+  }
+
+  @UseGuards(UserGuard)
+  @Get("/me")
+  getMe(@GetUser() user: User) {
+    return user;
   }
 }
