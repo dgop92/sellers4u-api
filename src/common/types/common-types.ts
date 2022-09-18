@@ -1,4 +1,4 @@
-export interface PaginationMetadata<T> {
+export interface SLPaginationResult<T> {
   count: number;
   totalPages: number;
   results: T[];
