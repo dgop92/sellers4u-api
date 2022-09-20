@@ -9,6 +9,10 @@ export interface BusinessCreateInput {
   };
 }
 
+export interface BusinessOptions {
+  fetchOwner?: boolean;
+}
+
 export interface BusinessPagination {
   /**
    * Limit results per request, max 500. must be used with skip
@@ -21,6 +25,7 @@ export interface BusinessPagination {
 }
 
 export interface BusinessSearchInput {
+  options?: BusinessOptions;
   pagination?: BusinessPagination;
   searchBy?: {
     appUserId?: number;

@@ -1,6 +1,5 @@
 export interface SLPaginationResult<T> {
   count: number;
-  totalPages: number;
   results: T[];
 }
 

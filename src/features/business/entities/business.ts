@@ -15,6 +15,10 @@ export const BusinessPaginationSchema = SkipLimitPaginationSchema.meta({
   className: "BusinessPagination",
 });
 
+export const BusinessOptionsSchema = Joi.object({
+  fetchOwner: Joi.boolean().default(false),
+}).meta({ className: "BusinessOptions" });
+
 export const BusinessSearchInputSchema = Joi.object({
   searchBy: Joi.object({
     id: Joi.number().optional(),
@@ -22,6 +26,7 @@ export const BusinessSearchInputSchema = Joi.object({
     appUserId: Joi.number().optional(),
   }).optional(),
   pagination: BusinessPaginationSchema,
+  options: BusinessOptionsSchema,
 }).meta({ className: "BusinessSearchInput" });
 
 export const BusinessCreateInputSchema = Joi.object({

@@ -2,8 +2,9 @@ import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { APP_ENV_VARS } from "@common/config/app-env-vars";
 import { authORMEntities } from "@features/auth/infrastructure/orm/entities";
+import { businessORMEntities } from "@features/business/infrastructure/orm/entities";
 
-const allEntities = [...authORMEntities];
+const allEntities = [...authORMEntities, ...businessORMEntities];
 
 export const TestDataSource = new DataSource({
   type: "postgres",

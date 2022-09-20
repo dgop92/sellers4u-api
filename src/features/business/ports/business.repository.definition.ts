@@ -17,23 +17,14 @@ export interface IBusinessRepository {
     appUser: AppUser,
     transactionManager?: T
   ): Promise<Business>;
-  update(
-    business: Business,
-    input: BusinessUpdateRepoData,
-    appUser: AppUser
-  ): Promise<Business>;
+  update(business: Business, input: BusinessUpdateRepoData): Promise<Business>;
   update<T>(
     business: Business,
     input: BusinessUpdateRepoData,
-    appUser: AppUser,
     transactionManager?: T
   ): Promise<Business>;
-  delete(business: Business, appUser: AppUser): Promise<void>;
-  delete<T>(
-    business: Business,
-    appUser: AppUser,
-    transactionManager?: T
-  ): Promise<void>;
+  delete(business: Business): Promise<void>;
+  delete<T>(business: Business, transactionManager?: T): Promise<void>;
   getOneBy(input: BusinessSearchInput): Promise<Business | undefined>;
   getOneBy<T>(
     input: BusinessSearchInput,

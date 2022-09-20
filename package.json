@@ -5,7 +5,7 @@
   "main": "build/main/index.js",
   "scripts": {
     "start": "node -r ./scripts/prod-setup.js dist/main/index.js",
-    "build": "tsc -p .",
+    "build": "tsc -p tsconfig.build.json",
     "schema-types": "ts-node -r tsconfig-paths/register ./scripts/create-schema-types.ts",
     "dev": "ts-node-dev -r ./scripts/dev-setup.ts --respawn src/main/index.ts",
     "test": "jest -c ./jest.unit.json --verbose --runInBand",
