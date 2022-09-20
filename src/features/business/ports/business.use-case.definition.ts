@@ -8,10 +8,6 @@ import {
   BusinessUpdateInput,
 } from "../schema-types";
 
-export type BusinessLookUpInput = {
-  id: number;
-};
-
 export interface IBusinessUseCase {
   create(input: BusinessCreateInput, appUser: AppUser): Promise<Business>;
   create(
@@ -25,12 +21,8 @@ export interface IBusinessUseCase {
     appUser: AppUser,
     transactionManager: any
   ): Promise<Business>;
-  delete(input: BusinessLookUpInput, appUser: AppUser): Promise<void>;
-  delete(
-    input: BusinessLookUpInput,
-    appUser: AppUser,
-    transactionManager: any
-  ): Promise<void>;
+  delete(appUser: AppUser): Promise<void>;
+  delete(appUser: AppUser, transactionManager: any): Promise<void>;
   getOneBy(input: BusinessSearchInput): Promise<Business | undefined>;
   getOneBy(
     input: BusinessSearchInput,

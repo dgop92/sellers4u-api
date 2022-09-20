@@ -8,6 +8,7 @@ export enum ErrorCode {
   ID_NOT_PROVIDED = "id-not-provided",
   NOT_FOUND = "not-found",
   UNAUTHORIZED = "unauthorized",
+  FORBIDDEN = "forbidden",
   APPLICATION_INTEGRITY_ERROR = "application-integrity-error",
 }
 

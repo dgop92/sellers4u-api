@@ -39,7 +39,4 @@ export const BusinessUpdateInputSchema = Joi.object({
   data: Joi.object({
     name: Joi.string().min(5).max(100).optional(),
   }).required(),
-  searchBy: Joi.object({
-    id: Joi.number().required(),
-  }).required(),
 }).meta({ className: "BusinessUpdateInput" });

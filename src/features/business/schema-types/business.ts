@@ -38,7 +38,4 @@ export interface BusinessUpdateInput {
   data: {
     name?: string;
   };
-  searchBy: {
-    id: number;
-  };
 }

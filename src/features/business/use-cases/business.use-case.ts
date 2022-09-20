@@ -9,21 +9,33 @@ import {
   BusinessUpdateInputSchema,
 } from "../entities/business";
 import { IBusinessRepository } from "../ports/business.repository.definition";
-import {
-  BusinessLookUpInput,
-  IBusinessUseCase,
-} from "../ports/business.use-case.definition";
+import { IBusinessUseCase } from "../ports/business.use-case.definition";
 import {
   BusinessCreateInput,
   BusinessSearchInput,
   BusinessUpdateInput,
 } from "../schema-types";
 import { AppUser } from "@features/auth/entities/app-user";
+import { ApplicationError, ErrorCode } from "@common/errors";
 
 const myLogger = AppLogger.getAppLogger().createFileLogger(__filename);
 
 export class BusinessUseCase implements IBusinessUseCase {
   constructor(private readonly repository: IBusinessRepository) {}
+
+  private getAppUserBusiness(
+    appUser: AppUser,
+    transactionManager?: any
+  ): Promise<Business | undefined> {
+    myLogger.debug("getting app user business", { appUserId: appUser.id });
+    return this.repository.getOneBy(
+      {
+        searchBy: { appUserId: appUser.id },
+        options: { fetchOwner: true },
+      },
+      transactionManager
+    );
+  }
 
   create(input: BusinessCreateInput, appUser: AppUser): Promise<Business>;
   create(
@@ -33,10 +45,22 @@ export class BusinessUseCase implements IBusinessUseCase {
   ): Promise<Business>;
   async create(
     input: BusinessCreateInput,
+    appUser: AppUser,
     transactionManager?: any
   ): Promise<Business> {
     this.validateInput(BusinessCreateInputSchema, input);
-    throw new Error("not implemented");
+
+    // If app user already have a business then throw error
+    const business = await this.getAppUserBusiness(appUser, transactionManager);
+    if (business) {
+      throw new ApplicationError(
+        "app user already have a business",
+        ErrorCode.DUPLICATED_RECORD,
+        { fieldName: "business" }
+      );
+    }
+
+    return this.repository.create(input.data, appUser, transactionManager);
   }
 
   update(input: BusinessUpdateInput, appUser: AppUser): Promise<Business>;
@@ -51,22 +75,23 @@ export class BusinessUseCase implements IBusinessUseCase {
     transactionManager?: any
   ): Promise<Business> {
     this.validateInput(BusinessUpdateInputSchema, input);
-    throw new Error("not implemented");
+
+    const business = await this.getAppUserBusiness(appUser, transactionManager);
+    if (!business) {
+      throw new ApplicationError("business not found", ErrorCode.NOT_FOUND);
+    }
+
+    return this.repository.update(business, input.data, transactionManager);
   }
 
-  delete(input: BusinessLookUpInput, appUser: AppUser): Promise<void>;
-  delete(
-    input: BusinessLookUpInput,
-    appUser: AppUser,
-    transactionManager: any
-  ): Promise<void>;
-  async delete(
-    input: BusinessLookUpInput,
-    appUser: AppUser,
-    transactionManager?: any
-  ): Promise<void> {
-    // this.validateInput(LookUpInputSchema, input);
-    throw new Error("not implemented");
+  delete(appUser: AppUser): Promise<void>;
+  delete(appUser: AppUser, transactionManager: any): Promise<void>;
+  async delete(appUser: AppUser, transactionManager?: any): Promise<void> {
+    const business = await this.getAppUserBusiness(appUser, transactionManager);
+    if (!business) {
+      throw new ApplicationError("business not found", ErrorCode.NOT_FOUND);
+    }
+    await this.repository.delete(business, transactionManager);
   }
 
   getOneBy(input: BusinessSearchInput): Promise<Business | undefined>;
