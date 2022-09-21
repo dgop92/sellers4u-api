@@ -7,6 +7,7 @@ import { AppDataSource } from "./db/data-source";
 import { AppModule } from "./nest/app.module";
 import { AllExceptionsFilter } from "./nest/general-exception-filter";
 import { authFactory } from "@features/auth/factories";
+import { businessModuleFactory } from "@features/business/factories";
 import { APP_ENV_VARS } from "@common/config/app-env-vars";
 
 export async function startApp() {
@@ -14,6 +15,7 @@ export async function startApp() {
   await dataSource.runMigrations();
 
   authFactory(dataSource);
+  businessModuleFactory(dataSource);
 
   const app = await NestFactory.create(AppModule);
   const httpAdapterHost = app.get(HttpAdapterHost);

@@ -17,7 +17,7 @@ export function appUserEntityFromDomain(appUser: AppUser): AppUserEntity {
   const appUserEntity = new AppUserEntity();
   appUserEntity.id = appUser.id;
   appUserEntity.firstName = appUser.firstName;
-  appUserEntity.lastName = appUser.firstName;
+  appUserEntity.lastName = appUser.lastName;
   appUserEntity.createdAt = appUser.createdAt;
   appUserEntity.updatedAt = appUser.updatedAt;
   appUserEntity.deletedAt = appUser.deletedAt;

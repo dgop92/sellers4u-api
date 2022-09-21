@@ -90,16 +90,19 @@ export function getWhereQueryData(
 
   Object.keys(searchBy).forEach((keyName) => {
     const value = searchBy[keyName];
-    const currentColumnOptions = columnOptions[keyName];
-    const columnName = currentColumnOptions?.columnName || keyName;
-    const searchType = currentColumnOptions?.searchType || SearchType.EQUAL;
-    const condition = `${aliasName}.${columnName} ${searchType} :${columnName}`;
-    whereQueryData.conditions.push(condition);
-    const onDecorateValue = currentColumnOptions?.onDecorateValue;
-    if (onDecorateValue) {
-      whereQueryData.params[columnName] = onDecorateValue(value);
-    } else {
-      whereQueryData.params[columnName] = value;
+
+    if (value !== undefined && value !== null) {
+      const currentColumnOptions = columnOptions[keyName];
+      const columnName = currentColumnOptions?.columnName || keyName;
+      const searchType = currentColumnOptions?.searchType || SearchType.EQUAL;
+      const condition = `${aliasName}.${columnName} ${searchType} :${columnName}`;
+      whereQueryData.conditions.push(condition);
+      const onDecorateValue = currentColumnOptions?.onDecorateValue;
+      if (onDecorateValue) {
+        whereQueryData.params[columnName] = onDecorateValue(value);
+      } else {
+        whereQueryData.params[columnName] = value;
+      }
     }
   });
 
