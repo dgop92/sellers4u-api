@@ -135,6 +135,13 @@ export class CategoryRepository
     });
   }
 
+  async deleteAll(): Promise<void> {
+    const tableName = this.repository.metadata.tableName;
+    myLogger.debug("deleting all categories", { tableName });
+    await this.repository.query(`DELETE FROM ${tableName}`);
+    myLogger.debug("all categories deleted");
+  }
+
   getOneBy(input: CategorySearchInput): Promise<Category | undefined>;
   getOneBy<T>(
     input: CategorySearchInput,

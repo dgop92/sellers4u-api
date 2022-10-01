@@ -22,6 +22,7 @@ export interface ICategoryRepository {
   ): Promise<Category>;
   delete(category: Category): Promise<void>;
   delete<T>(category: Category, transactionManager?: T): Promise<void>;
+  deleteAll(): Promise<void>;
   getOneBy(input: CategorySearchInput): Promise<Category | undefined>;
   getOneBy<T>(
     input: CategorySearchInput,

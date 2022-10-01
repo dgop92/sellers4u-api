@@ -1,3 +1,4 @@
+import { InvalidInputError } from "@common/errors";
 import { AppLogger } from "@common/logging/logger";
 import {
   createTestLogger,
@@ -144,6 +145,97 @@ describe("category use-case", () => {
       });
       expect(categoriesRetrieved).toHaveLength(1);
       expect(categoriesRetrieved.map((c) => c.name)).toContain("electronics");
+    });
+  });
+});
+
+describe("category use-case invalid input", () => {
+  let categoryUseCase: CategoryUseCase;
+
+  beforeAll(async () => {
+    categoryUseCase = new CategoryUseCase(undefined!);
+  });
+
+  describe("Create Invalid Input", () => {
+    it("should throw an error if name has more than 100 characters", async () => {
+      try {
+        await categoryUseCase.create({
+          data: { name: Array(130).join("x") },
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(InvalidInputError);
+        if (error instanceof InvalidInputError) {
+          expect(error.errorParams.fieldName).toBe("name");
+        }
+      }
+    });
+
+    it("should throw an error if name has less than 2 characters", async () => {
+      try {
+        await categoryUseCase.create({ data: { name: Array(1).join("x") } });
+      } catch (error) {
+        expect(error).toBeInstanceOf(InvalidInputError);
+        if (error instanceof InvalidInputError) {
+          expect(error.errorParams.fieldName).toBe("name");
+        }
+      }
+    });
+
+    it("should throw an error if description has more than 1000 characters", async () => {
+      try {
+        await categoryUseCase.create({
+          data: { description: Array(1050).join("x"), name: "aaaaaaa" },
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(InvalidInputError);
+        if (error instanceof InvalidInputError) {
+          expect(error.errorParams.fieldName).toBe("description");
+        }
+      }
+    });
+  });
+
+  describe("Update Invalid Input", () => {
+    it("should throw an error if name has more than 100 characters", async () => {
+      try {
+        await categoryUseCase.update({
+          data: { name: Array(130).join("x") },
+          searchBy: { id: 1 },
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(InvalidInputError);
+        if (error instanceof InvalidInputError) {
+          expect(error.errorParams.fieldName).toBe("name");
+        }
+      }
+    });
+
+    it("should throw an error if name has less than 2 characters", async () => {
+      try {
+        await categoryUseCase.update({
+          data: { name: Array(1).join("x") },
+          searchBy: { id: 1 },
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(InvalidInputError);
+        if (error instanceof InvalidInputError) {
+          expect(error.errorParams.fieldName).toBe("name");
+        }
+      }
+    });
+
+    it("should throw an error if description has more than 1000 characters", async () => {
+      try {
+        await categoryUseCase.update({
+          data: { description: Array(1050).join("x"), name: "aaaaaaa" },
+          searchBy: { id: 1 },
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(InvalidInputError);
+        if (error instanceof InvalidInputError) {
+          expect(error.errorParams.fieldName).toBe("description");
+        }
+      }
     });
   });
 });

@@ -9,6 +9,8 @@ import { AllExceptionsFilter } from "./nest/general-exception-filter";
 import { authFactory } from "@features/auth/factories";
 import { businessModuleFactory } from "@features/business/factories";
 import { APP_ENV_VARS } from "@common/config/app-env-vars";
+import { productModuleFactory } from "@features/product/factories";
+import { createAppCategories } from "@features/product/factories/category/create-categories";
 
 export async function startApp() {
   const dataSource = await AppDataSource.initialize();
@@ -16,6 +18,9 @@ export async function startApp() {
 
   authFactory(dataSource);
   businessModuleFactory(dataSource);
+  productModuleFactory(dataSource);
+
+  await createAppCategories();
 
   const app = await NestFactory.create(AppModule);
   const httpAdapterHost = app.get(HttpAdapterHost);

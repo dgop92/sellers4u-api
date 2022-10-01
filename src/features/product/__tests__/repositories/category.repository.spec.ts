@@ -83,6 +83,23 @@ describe("category repository", () => {
     });
   });
 
+  describe("Delete All", () => {
+    beforeEach(async () => {
+      await TestDBHelper.instance.clear();
+      await Promise.all([
+        categoryRepository.create(TEST_CATEGORIES.category1),
+        categoryRepository.create(TEST_CATEGORIES.category2),
+        categoryRepository.create(TEST_CATEGORIES.category3),
+      ]);
+    });
+
+    it("should delete all categories", async () => {
+      await categoryRepository.deleteAll();
+      const categoryRetrieved = await categoryRepository.getManyBy({});
+      expect(categoryRetrieved).toHaveLength(0);
+    });
+  });
+
   describe("Get one by", () => {
     let category1: Category;
 
@@ -119,11 +136,9 @@ describe("category repository", () => {
   });
 
   describe("Get many by", () => {
-    let category: Category[];
-
     beforeEach(async () => {
       await TestDBHelper.instance.clear();
-      category = await Promise.all([
+      await Promise.all([
         categoryRepository.create(TEST_CATEGORIES.category1),
         categoryRepository.create(TEST_CATEGORIES.category2),
         categoryRepository.create(TEST_CATEGORIES.category3),
