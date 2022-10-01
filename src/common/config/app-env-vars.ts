@@ -8,6 +8,7 @@ import {
 
 export const APP_ENV_VARS = {
   NODE_ENV: getOsEnv("NODE_ENV"),
+  isProduction: getOsEnv("NODE_ENV") === "prod",
   port: parseIntOrThrow(process.env.PORT || getOsEnv("APP_PORT")),
   db: {
     migrations: [getOsPath("TYPEORM_MIGRATIONS")],

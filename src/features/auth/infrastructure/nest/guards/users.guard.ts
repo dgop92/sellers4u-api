@@ -2,11 +2,15 @@ import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 import { AppLogger } from "@common/logging/logger";
 import { Request } from "express";
 import { ErrorCode, PresentationError } from "@common/errors";
-import { myAuthUserFactory } from "@features/auth/factories/auth-user.factory";
-import { AuthUser } from "@features/auth/entities/auth-user";
 import { myAppUserFactory } from "@features/auth/factories/app-user.factory";
+import { TokenVerifyFunction } from "@features/auth/ports/auth.use-case.definition";
+import { APP_ENV_VARS } from "@common/config/app-env-vars";
+import { verifyToken, verifyTokenMocked } from "../../firebase/utils";
 
 const myLogger = AppLogger.getAppLogger().createFileLogger(__filename);
+const tokenVerifyFunction: TokenVerifyFunction = APP_ENV_VARS.isProduction
+  ? verifyToken
+  : verifyTokenMocked;
 
 function extractTokenFromRequest(req: Request): string {
   myLogger.debug("extracting token from request");
@@ -61,23 +65,7 @@ export class AuthUserGuard implements CanActivate {
     const req = context.switchToHttp().getRequest();
 
     const token = extractTokenFromRequest(req);
-    const { authFirebaseClient } = myAuthUserFactory();
-
-    try {
-      myLogger.debug("verifying token");
-      const tokenPayload = await authFirebaseClient.verifyIdToken(token);
-      myLogger.debug("token verified", { userId: tokenPayload.uid });
-
-      req.authuser = {
-        id: tokenPayload.uid,
-        email: tokenPayload.email!,
-      };
-    } catch (error) {
-      throw new PresentationError(
-        error.errorInfo?.message || "invalid token",
-        ErrorCode.UNAUTHORIZED
-      );
-    }
+    req.authuser = await tokenVerifyFunction(token);
 
     return true;
   }
@@ -89,25 +77,9 @@ export class UserGuard implements CanActivate {
     const req = context.switchToHttp().getRequest();
 
     const token = extractTokenFromRequest(req);
-    const { authFirebaseClient } = myAuthUserFactory();
     const { appUserUseCase } = myAppUserFactory();
 
-    let authUser: AuthUser;
-    try {
-      myLogger.debug("verifying token");
-      const tokenPayload = await authFirebaseClient.verifyIdToken(token);
-      myLogger.debug("token verified", { userId: tokenPayload.uid });
-      authUser = {
-        id: tokenPayload.uid,
-        email: tokenPayload.email!,
-      };
-    } catch (error) {
-      throw new PresentationError(
-        error.errorInfo?.message || "invalid token",
-        ErrorCode.UNAUTHORIZED
-      );
-    }
-
+    const authUser = await tokenVerifyFunction(token);
     const appUser = await appUserUseCase.getOneBy({
       searchBy: { userId: authUser.id },
     });
