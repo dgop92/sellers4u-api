@@ -2,8 +2,13 @@ import { APP_ENV_VARS } from "@common/config/app-env-vars";
 import { DataSource } from "typeorm";
 import { authORMEntities } from "@features/auth/infrastructure/orm/entities";
 import { businessORMEntities } from "@features/business/infrastructure/orm/entities";
+import { productORMEntities } from "@features/product/infrastructure/orm/entities";
 
-const allEntities = [...authORMEntities, ...businessORMEntities];
+const allEntities = [
+  ...authORMEntities,
+  ...businessORMEntities,
+  ...productORMEntities,
+];
 
 export const AppDataSource = new DataSource({
   type: "postgres",
