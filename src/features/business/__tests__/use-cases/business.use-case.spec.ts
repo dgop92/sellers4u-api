@@ -18,7 +18,7 @@ AppLogger.getAppLogger().setLogger(winstonLogger);
 
 // Note userId is mock in order to not use firebase
 
-describe("business repository", () => {
+describe("business use-case", () => {
   let businessRepository: BusinessRepository;
   let businessUseCase: BusinessUseCase;
   let appUserRepository: AppUserRepository;

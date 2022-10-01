@@ -1,7 +1,5 @@
 import Joi from "joi";
 
 export const IntegerLookUpInputSchema = Joi.object({
-  searchBy: Joi.object({
-    id: Joi.number().required(),
-  }).required(),
+  id: Joi.number().required(),
 }).unknown();
