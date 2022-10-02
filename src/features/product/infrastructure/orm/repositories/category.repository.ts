@@ -157,7 +157,7 @@ export class CategoryRepository
       transactionManager
     );
     const categoryEntity = await genericBuilder.getQuery().getOne();
-    myLogger.debug("category found");
+    myLogger.debug("category was found?: ", { found: !!categoryEntity });
     return categoryEntity ? categoryEntityToDomain(categoryEntity) : undefined;
   }
 

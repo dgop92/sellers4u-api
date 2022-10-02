@@ -57,12 +57,12 @@ export class BusinessControllerV1 {
 
   @UseGuards(UserGuard)
   @Get("/own")
-  getOwn(
+  async getOwn(
     @GetUser() user: User,
     @Query() query: BusinessSearchInput["options"]
   ) {
     console.log(query);
-    const business = this.businessUseCase.getOneBy({
+    const business = await this.businessUseCase.getOneBy({
       searchBy: { appUserId: user.appUser.id },
       options: { fetchOwner: query?.fetchOwner },
     });

@@ -1,5 +1,6 @@
 import { AuthModule } from "@features/auth/infrastructure/nest/auth.module";
 import { BusinessModule } from "@features/business/infrastructure/nest/business.module";
+import { ProductModule } from "@features/product/infrastructure/nest/product.module";
 import { MiddlewareConsumer, Module, RequestMethod } from "@nestjs/common";
 import { APP_FILTER, RouterModule } from "@nestjs/core";
 import { AllExceptionsFilter } from "./general-exception-filter";
@@ -9,6 +10,7 @@ import { LoggerMiddleware } from "./logger-middleware";
   imports: [
     AuthModule,
     BusinessModule,
+    ProductModule,
     RouterModule.register([
       {
         path: "auth",
@@ -17,6 +19,10 @@ import { LoggerMiddleware } from "./logger-middleware";
       {
         path: "business",
         module: BusinessModule,
+      },
+      {
+        path: "product",
+        module: ProductModule,
       },
     ]),
   ],

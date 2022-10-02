@@ -148,7 +148,7 @@ export class BusinessRepository
       transactionManager
     );
     const businessEntity = await genericBuilder.getQuery().getOne();
-    myLogger.debug("business found");
+    myLogger.debug("business was found? ", { found: !!businessEntity });
     return businessEntity ? businessEntityToDomain(businessEntity) : undefined;
   }
 
