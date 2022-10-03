@@ -27,4 +27,7 @@ export const APP_ENV_VARS = {
   firebase: {
     credentialsPath: getOsPath("GOOGLE_APPLICATION_CREDENTIALS"),
   },
+  cloudinary: {
+    baseFolder: `${getOsEnv("CLOUDINARY_BASE_FOLDER")}/${getOsEnv("NODE_ENV")}`,
+  },
 };

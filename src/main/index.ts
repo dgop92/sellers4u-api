@@ -1,5 +1,6 @@
 import "reflect-metadata";
 import { AppLogger } from "@common/logging/logger";
+import { v2 as cloudinary } from "cloudinary";
 import { WinstonLogger, createDevLogger } from "@common/logging/winston-logger";
 import { HttpAdapterHost, NestFactory } from "@nestjs/core";
 import { VersioningType } from "@nestjs/common";
@@ -21,6 +22,10 @@ export async function startApp() {
   productModuleFactory(dataSource);
 
   await createAppCategories();
+
+  cloudinary.config({
+    secure: true,
+  });
 
   const app = await NestFactory.create(AppModule);
   const httpAdapterHost = app.get(HttpAdapterHost);
