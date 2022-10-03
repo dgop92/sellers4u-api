@@ -5,12 +5,14 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  ManyToOne,
   OneToMany,
 } from "typeorm";
-import { ProductEntity } from "./product.orm";
+import { CategoryEntity } from "./category.orm";
+import { ProductPhotoEntity } from "./product-photo.orm";
 
 @Entity()
-export class CategoryEntity {
+export class ProductEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -20,8 +22,17 @@ export class CategoryEntity {
   @Column("text", { nullable: false, default: "" })
   description: string;
 
-  @OneToMany(() => ProductEntity, (product) => product.category)
-  products: ProductEntity[];
+  @Column("varchar", { length: 50, nullable: false })
+  code: string;
+
+  @ManyToOne(() => CategoryEntity, (category) => category.products)
+  category: CategoryEntity;
+
+  @Column("integer", { nullable: false })
+  price: number;
+
+  @OneToMany(() => ProductPhotoEntity, (photo) => photo.product)
+  photos: ProductPhotoEntity[];
 
   @CreateDateColumn({ nullable: false })
   createdAt: Date;

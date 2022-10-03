@@ -5,23 +5,23 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
-  OneToMany,
+  ManyToOne,
 } from "typeorm";
 import { ProductEntity } from "./product.orm";
 
 @Entity()
-export class CategoryEntity {
+export class ProductPhotoEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column("varchar", { length: 130, nullable: false })
-  name: string;
+  @Column("varchar", { length: 160, nullable: false })
+  url: string;
 
-  @Column("text", { nullable: false, default: "" })
-  description: string;
+  @Column("varchar", { length: 100, nullable: false })
+  imageId: string;
 
-  @OneToMany(() => ProductEntity, (product) => product.category)
-  products: ProductEntity[];
+  @ManyToOne(() => ProductEntity, (product) => product.photos)
+  product: ProductEntity;
 
   @CreateDateColumn({ nullable: false })
   createdAt: Date;
