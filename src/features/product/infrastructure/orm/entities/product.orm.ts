@@ -1,3 +1,4 @@
+import { BusinessEntity } from "@features/business/infrastructure/orm/entities/business.orm";
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -7,11 +8,13 @@ import {
   DeleteDateColumn,
   ManyToOne,
   OneToMany,
+  Unique,
 } from "typeorm";
 import { CategoryEntity } from "./category.orm";
 import { ProductPhotoEntity } from "./product-photo.orm";
 
 @Entity()
+@Unique("unique_code", ["code"])
 export class ProductEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -26,13 +29,16 @@ export class ProductEntity {
   code: string;
 
   @ManyToOne(() => CategoryEntity, (category) => category.products)
-  category: CategoryEntity;
+  category?: CategoryEntity;
 
   @Column("integer", { nullable: false })
   price: number;
 
   @OneToMany(() => ProductPhotoEntity, (photo) => photo.product)
-  photos: ProductPhotoEntity[];
+  photos?: ProductPhotoEntity[];
+
+  @ManyToOne(() => BusinessEntity)
+  business?: BusinessEntity;
 
   @CreateDateColumn({ nullable: false })
   createdAt: Date;

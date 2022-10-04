@@ -6,10 +6,12 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   ManyToOne,
+  Unique,
 } from "typeorm";
 import { ProductEntity } from "./product.orm";
 
 @Entity()
+@Unique("unique_image_id", ["imageId"])
 export class ProductPhotoEntity {
   @PrimaryGeneratedColumn()
   id: number;

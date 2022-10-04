@@ -14,16 +14,37 @@ export const TEST_CATEGORIES = {
 };
 
 export const TEST_PRODUCT_PHOTOS = {
-  produtPhoto1: {
+  productPhoto1: {
     url: "https://res.cloudinary.com/inevaup/image/upload/v1664759760/baeuhie4ksjgignlq1sx.png",
     imageId: "baeuhie4ksjgignlq1sx",
   },
-  produtPhoto2: {
+  productPhoto2: {
     url: "https://res.cloudinary.com/inevaup/image/upload/v1664759760/qcycxuckzasiwfdwcrrc.png",
     imageId: "qcycxuckzasiwfdwcrrc",
   },
-  produtPhoto3: {
+  productPhoto3: {
     url: "https://res.cloudinary.com/inevaup/image/upload/v1664759760/hopfmjmxofsyurgytkqs.png",
     imageId: "hopfmjmxofsyurgytkqs",
+  },
+};
+
+export const TEST_PRODUCTS = {
+  product1: {
+    name: "product1",
+    code: "product1-code",
+    description: "product1 description",
+    price: 100,
+  },
+  product2: {
+    name: "product2",
+    code: "product2-code",
+    description: "anormal description",
+    price: 200,
+  },
+  product3: {
+    name: "diff-3",
+    code: "product3-code",
+    description: "product3 description",
+    price: 500,
   },
 };

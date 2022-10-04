@@ -50,11 +50,11 @@ export interface ProductSearchInput {
 
 export interface ProductUpdateInput {
   data: {
-    categoryId: number;
-    code: string;
+    categoryId?: number;
+    code?: string;
     description?: string;
-    name: string;
-    price: number;
+    name?: string;
+    price?: number;
   };
   searchBy: {
     id: number;

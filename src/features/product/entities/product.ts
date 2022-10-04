@@ -60,11 +60,11 @@ export const ProductCreateInputSchema = Joi.object({
 
 export const ProductUpdateInputSchema = Joi.object({
   data: Joi.object({
-    name: Joi.string().min(2).max(130).required(),
-    code: Joi.string().min(1).max(50).required(),
+    name: Joi.string().min(2).max(130).optional(),
+    code: Joi.string().min(1).max(50).optional(),
     description: Joi.string().max(1000).optional(),
-    price: Joi.number().positive().required(),
-    categoryId: Joi.number().required(),
+    price: Joi.number().positive().optional(),
+    categoryId: Joi.number().optional(),
   }).required(),
   searchBy: Joi.object({
     id: Joi.number().required(),

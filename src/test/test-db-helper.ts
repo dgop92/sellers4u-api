@@ -1,4 +1,4 @@
-import { DataSource } from "typeorm";
+import { DataSource, EntityTarget } from "typeorm";
 import { TestDataSource } from "./test-datasource";
 
 export class TestDBHelper {
@@ -37,5 +37,13 @@ export class TestDBHelper {
         `TRUNCATE ${entityData.tableName} RESTART IDENTITY CASCADE;`
       );
     }
+  }
+
+  async clearTable<Entity>(entityClass: EntityTarget<Entity>) {
+    const entityMetadata = this.datasource.getMetadata(entityClass);
+    const repository = this.datasource.getRepository(entityClass);
+    await repository.query(
+      `TRUNCATE ${entityMetadata.tableName} RESTART IDENTITY CASCADE;`
+    );
   }
 }
