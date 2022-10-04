@@ -25,5 +25,5 @@ export interface IProductPhotoRepository {
     input: ProductPhotoSearchInput,
     transactionManager?: T
   ): Promise<ProductPhoto | undefined>;
-  getManyBy(input: ProductPhotoSearchInput): void;
+  getManyBy(input: ProductPhotoSearchInput): Promise<ProductPhoto[]>;
 }

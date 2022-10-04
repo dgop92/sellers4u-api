@@ -1,6 +1,8 @@
 import { v2 as cloudinary } from "cloudinary";
-import { ProductPhoto } from "@features/product/entities/product-photo";
-import { IProductPhotoService } from "@features/product/ports/product-photo/product-photo.service.definition";
+import {
+  IProductPhotoService,
+  ProductPhotoSimplified,
+} from "@features/product/ports/product-photo/product-photo.service.definition";
 import { AppLogger } from "@common/logging/logger";
 
 const myLogger = AppLogger.getAppLogger().createFileLogger(__filename);
@@ -12,7 +14,7 @@ export class ProductPhotoService implements IProductPhotoService {
     this.folderName = `/${baseFolder}/product-photos/`;
   }
 
-  async saveAsBase64(base64image: string): Promise<ProductPhoto> {
+  async saveAsBase64(base64image: string): Promise<ProductPhotoSimplified> {
     myLogger.info("saving image to cloudinary");
     const result = await cloudinary.uploader.upload(base64image, {
       folder: this.folderName,

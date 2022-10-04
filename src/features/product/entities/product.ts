@@ -13,6 +13,9 @@ export interface Product {
   category?: Category;
   business?: Business;
   photos?: ProductPhoto[];
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
 }
 
 export const ProductPaginationSchema = SkipLimitPaginationSchema.meta({

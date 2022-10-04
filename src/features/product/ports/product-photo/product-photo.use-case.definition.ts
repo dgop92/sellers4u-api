@@ -24,5 +24,5 @@ export interface IProductPhotoUseCase {
     input: ProductPhotoSearchInput,
     transactionManager: any
   ): Promise<ProductPhoto | undefined>;
-  getManyBy(input: ProductPhotoSearchInput): void;
+  getManyBy(input: ProductPhotoSearchInput): Promise<ProductPhoto[]>;
 }

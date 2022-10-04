@@ -101,7 +101,7 @@ export class ProductPhotoUseCase implements IProductPhotoUseCase {
     return this.repository.getOneBy(input, transactionManager);
   }
 
-  getManyBy(input: ProductPhotoSearchInput): void {
+  getManyBy(input: ProductPhotoSearchInput): Promise<ProductPhoto[]> {
     this.validateInput(ProductPhotoSearchInputSchema, input);
     return this.repository.getManyBy(input);
   }

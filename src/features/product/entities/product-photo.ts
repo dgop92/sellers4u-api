@@ -3,6 +3,9 @@ import Joi from "joi";
 export interface ProductPhoto {
   imageId: string;
   url: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
 }
 
 export const ProductPhotoCreateInputSchema = Joi.object({
