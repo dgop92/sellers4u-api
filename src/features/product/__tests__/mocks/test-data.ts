@@ -1,3 +1,8 @@
+import { AppUserEntity } from "@features/auth/infrastructure/orm/entities/app-user.orm";
+import { BusinessEntity } from "@features/business/infrastructure/orm/entities/business.orm";
+import { CategoryEntity } from "@features/product/infrastructure/orm/entities/category.orm";
+import { DataSource } from "typeorm";
+
 export const TEST_CATEGORIES = {
   category1: {
     name: "food",
@@ -48,3 +53,32 @@ export const TEST_PRODUCTS = {
     price: 500,
   },
 };
+
+export async function createTestBusiness(
+  datasource: DataSource,
+  identifier: number
+) {
+  const appUserRepository = datasource.getRepository(AppUserEntity);
+  const businessRepository = datasource.getRepository(BusinessEntity);
+  const appUserEntity = await appUserRepository.save({
+    firstName: `test-fr-${identifier}`,
+    lastName: `test-lt-${identifier}`,
+    firebaseUserId: `G1J2tcEfOFYBycm8ZcXi9tZjN85${identifier}`,
+  });
+  const business = await businessRepository.save({
+    name: `test business ${identifier}`,
+    appUser: appUserEntity,
+  });
+  return business;
+}
+
+export async function createTestCategory(
+  datasource: DataSource,
+  identifier: number
+) {
+  const categoryRepository = datasource.getRepository(CategoryEntity);
+  const category = await categoryRepository.save({
+    name: `test category ${identifier}`,
+  });
+  return category;
+}

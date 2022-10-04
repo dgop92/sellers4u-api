@@ -4,42 +4,21 @@ import {
   createTestLogger,
   WinstonLogger,
 } from "@common/logging/winston-logger";
-import { AppUserEntity } from "@features/auth/infrastructure/orm/entities/app-user.orm";
 import { BusinessEntity } from "@features/business/infrastructure/orm/entities/business.orm";
 import { Product } from "@features/product/entities/product";
 import { CategoryEntity } from "@features/product/infrastructure/orm/entities/category.orm";
 import { ProductEntity } from "@features/product/infrastructure/orm/entities/product.orm";
 import { ProductRepository } from "@features/product/infrastructure/orm/repositories/product.repository";
 import { TestDBHelper } from "test/test-db-helper";
-import { DataSource } from "typeorm";
-import { TEST_PRODUCTS } from "../mocks/test-data";
+import {
+  createTestBusiness,
+  createTestCategory,
+  TEST_PRODUCTS,
+} from "../mocks/test-data";
 
 const logger = createTestLogger();
 const winstonLogger = new WinstonLogger(logger);
 AppLogger.getAppLogger().setLogger(winstonLogger);
-
-async function createTestBusiness(datasource: DataSource, identifier: number) {
-  const appUserRepository = datasource.getRepository(AppUserEntity);
-  const businessRepository = datasource.getRepository(BusinessEntity);
-  const appUserEntity = await appUserRepository.save({
-    firstName: `test-fr-${identifier}`,
-    lastName: `test-lt-${identifier}`,
-    firebaseUserId: `G1J2tcEfOFYBycm8ZcXi9tZjN85${identifier}`,
-  });
-  const business = await businessRepository.save({
-    name: `test business ${identifier}`,
-    appUser: appUserEntity,
-  });
-  return business;
-}
-
-async function createTestCategory(datasource: DataSource, identifier: number) {
-  const categoryRepository = datasource.getRepository(CategoryEntity);
-  const category = await categoryRepository.save({
-    name: `test category ${identifier}`,
-  });
-  return category;
-}
 
 describe("product repository", () => {
   let productRepository: ProductRepository;

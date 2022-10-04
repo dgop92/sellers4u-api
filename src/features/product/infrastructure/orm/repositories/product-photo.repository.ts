@@ -1,3 +1,4 @@
+import { ErrorCode, RepositoryError } from "@common/errors";
 import { AppLogger } from "@common/logging/logger";
 import { BaseRepository } from "@common/orm/base-repository";
 import {
@@ -13,6 +14,7 @@ import { ProductPhotoSearchInput } from "@features/product/schema-types";
 import {
   DataSource,
   EntityManager,
+  QueryFailedError,
   Repository,
   SelectQueryBuilder,
 } from "typeorm";
@@ -41,21 +43,35 @@ export class ProductPhotoRepository
     input: ProductPhotoCreateRepoData,
     transactionManager?: EntityManager
   ): Promise<ProductPhoto> {
-    myLogger.debug("saving product photo in db");
-    const productPhotoEntity = this.repository.create({
-      product: { id: input.productId },
-      imageId: input.imageId,
-      url: input.url,
-    });
-    let productPhotoEntitySaved: ProductPhotoEntity;
-    if (transactionManager) {
-      productPhotoEntitySaved = await transactionManager.save(
-        productPhotoEntity
-      );
+    try {
+      myLogger.debug("saving product photo in db");
+      const productPhotoEntity = this.repository.create({
+        product: { id: input.productId },
+        imageId: input.imageId,
+        url: input.url,
+      });
+      let productPhotoEntitySaved: ProductPhotoEntity;
+      if (transactionManager) {
+        productPhotoEntitySaved = await transactionManager.save(
+          productPhotoEntity
+        );
+      }
+      productPhotoEntitySaved = await this.repository.save(productPhotoEntity);
+      myLogger.debug("saved product photo in db");
+      return productPhotoEntityToDomain(productPhotoEntitySaved);
+    } catch (error) {
+      if (error instanceof QueryFailedError) {
+        if (error.driverError.constraint === "unique_image_id") {
+          throw new RepositoryError(
+            "product with given imageId already exists",
+            ErrorCode.DUPLICATED_RECORD,
+            { fieldName: "imageId" }
+          );
+        }
+      }
+      myLogger.error(error?.stack);
+      throw error;
     }
-    productPhotoEntitySaved = await this.repository.save(productPhotoEntity);
-    myLogger.debug("saved product photo in db");
-    return productPhotoEntityToDomain(productPhotoEntitySaved);
   }
 
   delete(productPhoto: ProductPhoto): Promise<void>;
