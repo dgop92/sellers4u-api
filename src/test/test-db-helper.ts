@@ -46,4 +46,11 @@ export class TestDBHelper {
       `TRUNCATE ${entityMetadata.tableName} RESTART IDENTITY CASCADE;`
     );
   }
+
+  // TODO, be aware of sql injection
+  async rawClearTable(tableName: string) {
+    await this.datasource.query(
+      `TRUNCATE ${tableName} RESTART IDENTITY CASCADE;`
+    );
+  }
 }

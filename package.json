@@ -8,6 +8,7 @@
     "build": "tsc -p tsconfig.build.json",
     "schema-types": "ts-node -r tsconfig-paths/register ./scripts/create-schema-types.ts",
     "dev": "ts-node-dev -r ./scripts/dev-setup.ts --respawn src/main/index.ts",
+    "test-server": "ts-node-dev -r ./scripts/test-setup.ts --respawn src/test/test-server.ts",
     "test": "jest -c ./jest.unit.json --verbose --runInBand",
     "typeorm": "ts-node -r ./scripts/dev-setup.ts ./node_modules/typeorm/cli.js -d src/main/db/data-source.ts",
     "nest": "nest"

@@ -5,6 +5,8 @@ import { IAuthUserUseCase } from "../ports/auth-user.use-case.definition";
 import { AuthUserUseCase } from "../use-cases/auth-user.use-case.";
 import { FirebaseUserRepository } from "../infrastructure/firebase/auth-user.firebase.repository";
 import { getAuthFirebaseClient } from "../infrastructure/firebase/firebase-app";
+import { APP_ENV_VARS } from "@common/config/app-env-vars";
+import { AuthUserMockedRepository } from "../infrastructure/firebase/auth-user.mock.repository";
 
 const myLogger = AppLogger.getAppLogger().createFileLogger(__filename);
 
@@ -17,8 +19,12 @@ export const myAuthUserFactory = () => {
 
   if (authUserRepository === undefined) {
     myLogger.info("creating authUserRepository");
-    authFirebaseClient = getAuthFirebaseClient();
-    authUserRepository = new FirebaseUserRepository(authFirebaseClient);
+    if (APP_ENV_VARS.isTest) {
+      authUserRepository = new AuthUserMockedRepository();
+    } else {
+      authFirebaseClient = getAuthFirebaseClient();
+      authUserRepository = new FirebaseUserRepository(authFirebaseClient);
+    }
     myLogger.info("authUserRepository created");
   }
 

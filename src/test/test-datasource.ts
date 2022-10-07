@@ -23,4 +23,5 @@ export const TestDataSource = new DataSource({
   migrations: APP_ENV_VARS.db.migrations,
   entities: allEntities,
   name: "default",
+  dropSchema: true,
 });

@@ -28,8 +28,12 @@ export async function verifyToken(token: string): Promise<AuthUser> {
 }
 
 export async function verifyTokenMocked(token: string): Promise<AuthUser> {
-  return {
-    email: "some@email.com",
-    id: "xx222deok33WOf22LCufOHXSOcxx",
-  };
+  try {
+    return JSON.parse(token);
+  } catch (error) {
+    return {
+      email: "some@email.com",
+      id: "xx222deok33WOf22LCufOHXSOcxx",
+    };
+  }
 }

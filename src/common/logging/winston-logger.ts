@@ -1,5 +1,6 @@
 import { ILogger } from "./logger";
 import winston from "winston";
+import { APP_ENV_VARS } from "@common/config/app-env-vars";
 const winsFormat = winston.format;
 
 export class WinstonLogger implements ILogger {
@@ -61,7 +62,7 @@ export function createDevLogger() {
   );
 
   const logger = winston.createLogger({
-    level: "debug",
+    level: APP_ENV_VARS.logging.level,
     levels: MY_CUSTOM_LEVELS.levels,
     format: winsFormat.combine(
       winsFormat.colorize(),

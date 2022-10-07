@@ -3,6 +3,7 @@ import { BusinessModule } from "@features/business/infrastructure/nest/business.
 import { ProductModule } from "@features/product/infrastructure/nest/product.module";
 import { MiddlewareConsumer, Module, RequestMethod } from "@nestjs/common";
 import { APP_FILTER, RouterModule } from "@nestjs/core";
+import { DBSeedControllerV1 } from "./db-seed.controller";
 import { AllExceptionsFilter } from "./general-exception-filter";
 import { LoggerMiddleware } from "./logger-middleware";
 
@@ -26,13 +27,13 @@ import { LoggerMiddleware } from "./logger-middleware";
       },
     ]),
   ],
-
   providers: [
     {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
     },
   ],
+  controllers: [DBSeedControllerV1],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
