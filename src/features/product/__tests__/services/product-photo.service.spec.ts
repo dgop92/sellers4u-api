@@ -9,7 +9,7 @@ import {
 import { ProductPhotoService } from "@features/product/infrastructure/image-service/product-photo.service";
 import { addBase64Prefix } from "@common/fileHelpers";
 import { APP_ENV_VARS } from "@common/config/app-env-vars";
-import { ProductPhoto } from "@features/product/entities/product-photo";
+import { ProductPhotoSimplified } from "@features/product/ports/product-photo/product-photo.service.definition";
 
 const logger = createTestLogger();
 const winstonLogger = new WinstonLogger(logger);
@@ -29,7 +29,7 @@ async function cloudinaryResourceExits(publicId: string) {
 
 describe("cloudinary service", () => {
   let productPhotoService: ProductPhotoService;
-  let photoProduct1: ProductPhoto;
+  let photoProduct1: ProductPhotoSimplified;
 
   beforeAll(async () => {
     const baseFolder = APP_ENV_VARS.cloudinary.baseFolder;
