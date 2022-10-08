@@ -35,6 +35,9 @@ export async function startApp() {
     type: VersioningType.URI,
     defaultVersion: "1",
   });
+  app.enableCors({
+    origin: APP_ENV_VARS.cors.allowOrigins,
+  });
   await app.listen(APP_ENV_VARS.port);
 
   myLogger.info("app started");

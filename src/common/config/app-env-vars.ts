@@ -4,6 +4,7 @@ import {
   getOsPath,
   parseBoolOrThrow,
   parseIntOrThrow,
+  parseListOrDefault,
 } from "./env-utils";
 
 export const APP_ENV_VARS = {
@@ -33,5 +34,11 @@ export const APP_ENV_VARS = {
   },
   logging: {
     level: getOsEnvOrDefault("LOG_LEVEL", "info"),
+  },
+  cors: {
+    allowOrigins: parseListOrDefault(
+      getOsEnvOrDefault("CORS_ALLOW_ORIGINS", ""),
+      "*"
+    ),
   },
 };

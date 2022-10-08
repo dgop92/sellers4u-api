@@ -42,3 +42,14 @@ export function parseBoolOrThrow(value: string): boolean {
   }
   return value === "true";
 }
+
+export function parseList(value: string): string[] {
+  return value.split(",");
+}
+
+export function parseListOrDefault<T>(
+  value: string,
+  defaultValue: T
+): string[] | T {
+  return value ? parseList(value) : defaultValue;
+}
