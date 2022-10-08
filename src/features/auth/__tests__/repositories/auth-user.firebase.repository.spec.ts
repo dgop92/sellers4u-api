@@ -9,11 +9,9 @@ import { getAuthFirebaseClient } from "@features/auth/infrastructure/firebase/fi
 import { AuthUser } from "@features/auth/entities/auth-user";
 
 import { ErrorCode, RepositoryError } from "@common/errors";
-import {
-  deleteAllFirebaseUsers,
-  RANDOM_USER_ID,
-} from "../mocks/firebase-test-helpers";
+import { RANDOM_USER_ID } from "../mocks/firebase-test-helpers";
 import { TEST_EMAILS } from "../mocks/users-test-data";
+import { deleteAllFirebaseUsers } from "@features/auth/infrastructure/firebase/utils";
 
 const logger = createTestLogger();
 const winstonLogger = new WinstonLogger(logger);

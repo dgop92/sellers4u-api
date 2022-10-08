@@ -1,3 +1,4 @@
+import { Auth as FirebaseAuth } from "firebase-admin/auth";
 import { ErrorCode, PresentationError } from "@common/errors";
 import { AppLogger } from "@common/logging/logger";
 import { AuthUser } from "@features/auth/entities/auth-user";
@@ -35,5 +36,14 @@ export async function verifyTokenMocked(token: string): Promise<AuthUser> {
       email: "some@email.com",
       id: "xx222deok33WOf22LCufOHXSOcxx",
     };
+  }
+}
+
+export async function deleteAllFirebaseUsers(authFirebaseClient: FirebaseAuth) {
+  const listUsersResult = await authFirebaseClient.listUsers(100);
+  const uids = listUsersResult.users.map((userRecord) => userRecord.uid);
+  if (uids.length > 0) {
+    console.log(uids);
+    await authFirebaseClient.deleteUsers(uids);
   }
 }

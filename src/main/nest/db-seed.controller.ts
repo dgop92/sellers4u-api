@@ -1,5 +1,8 @@
 import { APP_ENV_VARS } from "@common/config/app-env-vars";
 import { AppLogger } from "@common/logging/logger";
+import { myAuthUserFactory } from "@features/auth/factories/auth-user.factory";
+import { AuthUserMockedRepository } from "@features/auth/infrastructure/firebase/auth-user.mock.repository";
+import { deleteAllFirebaseUsers } from "@features/auth/infrastructure/firebase/utils";
 import {
   Body,
   Controller,
@@ -26,11 +29,19 @@ type SetupDataBody = {
 })
 export class DBSeedControllerV1 {
   @Post("/clear-all")
-  async clearDatabase() {
+  async clearDatabaseAndServices() {
     if (!APP_ENV_VARS.isProduction) {
       myLogger.debug("deleting database");
       await TestDBHelper.instance.clear();
       myLogger.debug("database deleted");
+      myLogger.debug("deleting auth users");
+      if (APP_ENV_VARS.isTest) {
+        AuthUserMockedRepository.authUsers = [];
+      } else {
+        const { authFirebaseClient } = myAuthUserFactory();
+        await deleteAllFirebaseUsers(authFirebaseClient);
+      }
+      myLogger.debug("auth users deleted");
       return { clearSuccessful: true };
     }
     throw new HttpException(

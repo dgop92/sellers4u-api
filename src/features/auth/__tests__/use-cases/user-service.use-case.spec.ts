@@ -6,10 +6,7 @@ import {
 import { FirebaseUserRepository } from "@features/auth/infrastructure/firebase/auth-user.firebase.repository";
 import { Auth as FirebaseAuth } from "firebase-admin/auth";
 import { getAuthFirebaseClient } from "@features/auth/infrastructure/firebase/firebase-app";
-import {
-  deleteAllFirebaseUsers,
-  RANDOM_USER_ID,
-} from "../mocks/firebase-test-helpers";
+import { RANDOM_USER_ID } from "../mocks/firebase-test-helpers";
 import { AuthUserUseCase } from "@features/auth/use-cases/auth-user.use-case.";
 import { TEST_APP_USERS, TEST_EMAILS } from "../mocks/users-test-data";
 import { ApplicationError, ErrorCode, InvalidInputError } from "@common/errors";
@@ -18,6 +15,7 @@ import { TestDBHelper } from "test/test-db-helper";
 import { AppUserRepository } from "@features/auth/infrastructure/orm/repositories/app-user.repository";
 import { UserServiceUseCase } from "@features/auth/use-cases/user-service.use-case";
 import { User } from "@features/auth/entities/user";
+import { deleteAllFirebaseUsers } from "@features/auth/infrastructure/firebase/utils";
 
 const logger = createTestLogger();
 const winstonLogger = new WinstonLogger(logger);
