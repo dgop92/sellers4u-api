@@ -3,8 +3,9 @@ import { BusinessModule } from "@features/business/infrastructure/nest/business.
 import { ProductModule } from "@features/product/infrastructure/nest/product.module";
 import { MiddlewareConsumer, Module, RequestMethod } from "@nestjs/common";
 import { APP_FILTER, RouterModule } from "@nestjs/core";
-import { AllExceptionsFilter } from "./general-exception-filter";
-import { LoggerMiddleware } from "./logger-middleware";
+import { AllExceptionsFilter } from "main/nest/general-exception-filter";
+import { LoggerMiddleware } from "main/nest/logger-middleware";
+import { TestUtilControllerV1 } from "./test-utils.controller";
 
 @Module({
   imports: [
@@ -32,8 +33,9 @@ import { LoggerMiddleware } from "./logger-middleware";
       useClass: AllExceptionsFilter,
     },
   ],
+  controllers: [TestUtilControllerV1],
 })
-export class AppModule {
+export class TestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(LoggerMiddleware)

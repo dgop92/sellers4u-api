@@ -22,10 +22,10 @@ type SetupDataBody = {
 };
 
 @Controller({
-  path: "db-seed",
+  path: "test-util",
   version: "1",
 })
-export class DBSeedControllerV1 {
+export class TestUtilControllerV1 {
   @Post("/clear-all")
   async clearDatabaseAndServices() {
     if (!APP_ENV_VARS.isProduction) {
