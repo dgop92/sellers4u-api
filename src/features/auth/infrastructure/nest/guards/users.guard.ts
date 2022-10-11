@@ -3,14 +3,9 @@ import { AppLogger } from "@common/logging/logger";
 import { Request } from "express";
 import { ErrorCode, PresentationError } from "@common/errors";
 import { myAppUserFactory } from "@features/auth/factories/app-user.factory";
-import { TokenVerifyFunction } from "@features/auth/ports/auth.use-case.definition";
-import { APP_ENV_VARS } from "@common/config/app-env-vars";
-import { verifyToken, verifyTokenMocked } from "../../firebase/utils";
+import { myAuthUserFactory } from "@features/auth/factories/auth-user.factory";
 
 const myLogger = AppLogger.getAppLogger().createFileLogger(__filename);
-const tokenVerifyFunction: TokenVerifyFunction = APP_ENV_VARS.isProduction
-  ? verifyToken
-  : verifyTokenMocked;
 
 function extractTokenFromRequest(req: Request): string {
   myLogger.debug("extracting token from request");
@@ -64,8 +59,9 @@ export class AuthUserGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     const req = context.switchToHttp().getRequest();
 
+    const { authUserRepository } = myAuthUserFactory();
     const token = extractTokenFromRequest(req);
-    req.authuser = await tokenVerifyFunction(token);
+    req.authuser = await authUserRepository.verifyToken(token);
 
     return true;
   }
@@ -78,8 +74,9 @@ export class UserGuard implements CanActivate {
 
     const token = extractTokenFromRequest(req);
     const { appUserUseCase } = myAppUserFactory();
+    const { authUserRepository } = myAuthUserFactory();
 
-    const authUser = await tokenVerifyFunction(token);
+    const authUser = await authUserRepository.verifyToken(token);
     const appUser = await appUserUseCase.getOneBy({
       searchBy: { userId: authUser.id },
     });

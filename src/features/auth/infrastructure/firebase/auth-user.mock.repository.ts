@@ -84,4 +84,22 @@ export class AuthUserMockedRepository implements IAuthUserRepository {
     myLogger.debug("auth user found", { id });
     return Promise.resolve(authUser);
   }
+
+  deleteAll(): Promise<void> {
+    myLogger.debug("deleting all auth users");
+    AuthUserMockedRepository.authUsers = [];
+    myLogger.debug("all auth users deleted");
+    return Promise.resolve();
+  }
+
+  verifyToken(token: string): Promise<AuthUser> {
+    try {
+      return JSON.parse(token);
+    } catch (error) {
+      return Promise.resolve({
+        email: "some@email.com",
+        id: "xx222deok33WOf22LCufOHXSOcxx",
+      });
+    }
+  }
 }

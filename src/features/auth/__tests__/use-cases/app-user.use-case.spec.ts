@@ -7,10 +7,10 @@ import {
 import { AppUserRepository } from "@features/auth/infrastructure/orm/repositories/app-user.repository";
 import { TestDBHelper } from "test/test-db-helper";
 import { AppUser } from "@features/auth/entities/app-user";
-import { TEST_APP_USERS, TEST_USERS } from "../mocks/users-test-data";
+import { TEST_APP_USERS, TEST_USERS } from "../test-utils/users-test-data";
 import { AppUserUseCase } from "@features/auth/use-cases/app-user.use-case";
 import { ApplicationError, ErrorCode, InvalidInputError } from "@common/errors";
-import { RANDOM_USER_ID } from "../mocks/firebase-test-helpers";
+import { RANDOM_USER_ID } from "../test-utils/firebase-test-helpers";
 
 const logger = createTestLogger();
 const winstonLogger = new WinstonLogger(logger);

@@ -9,9 +9,8 @@ import { getAuthFirebaseClient } from "@features/auth/infrastructure/firebase/fi
 import { AuthUser } from "@features/auth/entities/auth-user";
 
 import { ErrorCode, RepositoryError } from "@common/errors";
-import { RANDOM_USER_ID } from "../mocks/firebase-test-helpers";
-import { TEST_EMAILS } from "../mocks/users-test-data";
-import { deleteAllFirebaseUsers } from "@features/auth/infrastructure/firebase/utils";
+import { RANDOM_USER_ID } from "../test-utils/firebase-test-helpers";
+import { TEST_EMAILS } from "../test-utils/users-test-data";
 
 const logger = createTestLogger();
 const winstonLogger = new WinstonLogger(logger);
@@ -29,7 +28,7 @@ describe("firebase repository", () => {
 
   describe("Create", () => {
     beforeEach(async () => {
-      await deleteAllFirebaseUsers(authFirebaseClient);
+      await firebaseUserRepository.deleteAll();
       authUser1 = await firebaseUserRepository.create({
         email: TEST_EMAILS.emailTest1,
         password: "secret-PASSWORD-1234",
@@ -70,7 +69,7 @@ describe("firebase repository", () => {
 
   describe("Get One By", () => {
     beforeEach(async () => {
-      await deleteAllFirebaseUsers(authFirebaseClient);
+      await firebaseUserRepository.deleteAll();
       authUser1 = await firebaseUserRepository.create({
         email: TEST_EMAILS.emailTest1,
         password: "secret-PASSWORD-1234",
@@ -106,7 +105,7 @@ describe("firebase repository", () => {
 
   describe("Delete", () => {
     beforeEach(async () => {
-      await deleteAllFirebaseUsers(authFirebaseClient);
+      await firebaseUserRepository.deleteAll();
       authUser1 = await firebaseUserRepository.create({
         email: TEST_EMAILS.emailTest1,
         password: "secret-PASSWORD-1234",

@@ -7,4 +7,6 @@ export interface IAuthUserRepository {
   create(input: AuthUserCreateRepoData): Promise<AuthUser>;
   delete(user: AuthUser): Promise<void>;
   getOneBy(input: AuthUserSearchInput): Promise<AuthUser | undefined>;
+  verifyToken(token: string): Promise<AuthUser>;
+  deleteAll(): Promise<void>;
 }

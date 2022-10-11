@@ -6,16 +6,15 @@ import {
 import { FirebaseUserRepository } from "@features/auth/infrastructure/firebase/auth-user.firebase.repository";
 import { Auth as FirebaseAuth } from "firebase-admin/auth";
 import { getAuthFirebaseClient } from "@features/auth/infrastructure/firebase/firebase-app";
-import { RANDOM_USER_ID } from "../mocks/firebase-test-helpers";
+import { RANDOM_USER_ID } from "../test-utils/firebase-test-helpers";
 import { AuthUserUseCase } from "@features/auth/use-cases/auth-user.use-case.";
-import { TEST_APP_USERS, TEST_EMAILS } from "../mocks/users-test-data";
+import { TEST_APP_USERS, TEST_EMAILS } from "../test-utils/users-test-data";
 import { ApplicationError, ErrorCode, InvalidInputError } from "@common/errors";
 import { AppUserUseCase } from "@features/auth/use-cases/app-user.use-case";
 import { TestDBHelper } from "test/test-db-helper";
 import { AppUserRepository } from "@features/auth/infrastructure/orm/repositories/app-user.repository";
 import { UserServiceUseCase } from "@features/auth/use-cases/user-service.use-case";
 import { User } from "@features/auth/entities/user";
-import { deleteAllFirebaseUsers } from "@features/auth/infrastructure/firebase/utils";
 
 const logger = createTestLogger();
 const winstonLogger = new WinstonLogger(logger);
@@ -26,14 +25,13 @@ describe("user service use-case", () => {
   let appUserUseCase: AppUserUseCase;
   let userServiceUseCase: UserServiceUseCase;
   let authFirebaseClient: FirebaseAuth;
+  let firebaseUserRepository: FirebaseUserRepository;
 
   beforeAll(async () => {
     await TestDBHelper.instance.setupTestDB();
     authFirebaseClient = getAuthFirebaseClient();
 
-    const firebaseUserRepository = new FirebaseUserRepository(
-      authFirebaseClient
-    );
+    firebaseUserRepository = new FirebaseUserRepository(authFirebaseClient);
     authUserUseCase = new AuthUserUseCase(firebaseUserRepository);
     const appUserRepository = new AppUserRepository(
       TestDBHelper.instance.datasource
@@ -51,7 +49,7 @@ describe("user service use-case", () => {
 
   describe("Create", () => {
     beforeEach(async () => {
-      await deleteAllFirebaseUsers(authFirebaseClient);
+      await firebaseUserRepository.deleteAll();
       await TestDBHelper.instance.clear();
       await userServiceUseCase.create({
         authUserData: {
@@ -122,7 +120,7 @@ describe("user service use-case", () => {
     let user1: User;
 
     beforeEach(async () => {
-      await deleteAllFirebaseUsers(authFirebaseClient);
+      await firebaseUserRepository.deleteAll();
       await TestDBHelper.instance.clear();
       user1 = await userServiceUseCase.create({
         authUserData: {
@@ -173,7 +171,7 @@ describe("user service use-case", () => {
     let user: User;
 
     beforeEach(async () => {
-      await deleteAllFirebaseUsers(authFirebaseClient);
+      await firebaseUserRepository.deleteAll();
       await TestDBHelper.instance.clear();
       user = await userServiceUseCase.create({
         authUserData: {

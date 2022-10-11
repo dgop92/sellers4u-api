@@ -8,8 +8,8 @@ import { ErrorCode, RepositoryError } from "@common/errors";
 import { AppUserRepository } from "@features/auth/infrastructure/orm/repositories/app-user.repository";
 import { TestDBHelper } from "test/test-db-helper";
 import { AppUser } from "@features/auth/entities/app-user";
-import { TEST_APP_USERS, TEST_USERS } from "../mocks/users-test-data";
-import { RANDOM_USER_ID } from "../mocks/firebase-test-helpers";
+import { TEST_APP_USERS, TEST_USERS } from "../test-utils/users-test-data";
+import { RANDOM_USER_ID } from "../test-utils/firebase-test-helpers";
 
 const logger = createTestLogger();
 const winstonLogger = new WinstonLogger(logger);

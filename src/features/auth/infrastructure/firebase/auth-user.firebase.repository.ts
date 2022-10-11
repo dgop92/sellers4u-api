@@ -88,4 +88,32 @@ export class FirebaseUserRepository implements IAuthUserRepository {
       throw error;
     }
   }
+
+  async deleteAll(): Promise<void> {
+    myLogger.debug("deleting all auth users");
+    const allUsers = await this.authFirebaseClient.listUsers();
+    await Promise.all(
+      allUsers.users.map((user) => this.authFirebaseClient.deleteUser(user.uid))
+    );
+    myLogger.debug("all auth users deleted");
+  }
+
+  async verifyToken(token: string): Promise<AuthUser> {
+    let authUser: AuthUser;
+    try {
+      myLogger.debug("verifying token");
+      const tokenPayload = await this.authFirebaseClient.verifyIdToken(token);
+      myLogger.debug("token verified", { userId: tokenPayload.uid });
+      authUser = {
+        id: tokenPayload.uid,
+        email: tokenPayload.email!,
+      };
+      return authUser;
+    } catch (error) {
+      throw new RepositoryError(
+        error.errorInfo?.message || "invalid token",
+        ErrorCode.UNAUTHORIZED
+      );
+    }
+  }
 }
