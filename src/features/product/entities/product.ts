@@ -34,6 +34,8 @@ export const ProductSearchInputSchema = Joi.object({
     code: Joi.string().optional(),
     name: Joi.string().optional(),
     description: Joi.string().optional(),
+    businessId: Joi.number().optional(),
+    categoryId: Joi.number().optional(),
   }).optional(),
   filterBy: Joi.object({
     price: Joi.object({

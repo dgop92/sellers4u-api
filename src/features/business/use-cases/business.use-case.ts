@@ -23,15 +23,20 @@ const myLogger = AppLogger.getAppLogger().createFileLogger(__filename);
 export class BusinessUseCase implements IBusinessUseCase {
   constructor(private readonly repository: IBusinessRepository) {}
 
-  private getAppUserBusiness(
+  getAppUserBusiness(appUser: AppUser): Promise<Business | undefined>;
+  getAppUserBusiness(
     appUser: AppUser,
-    transactionManager?: any
+    transactionManager: any
+  ): Promise<Business | undefined>;
+  getAppUserBusiness(
+    appUser: AppUser,
+    transactionManager?: unknown
   ): Promise<Business | undefined> {
-    myLogger.debug("getting app user business", { appUserId: appUser.id });
+    myLogger.debug("getting business of app user", { appUserId: appUser.id });
     return this.repository.getOneBy(
       {
         searchBy: { appUserId: appUser.id },
-        options: { fetchOwner: true },
+        options: { fetchOwner: false },
       },
       transactionManager
     );

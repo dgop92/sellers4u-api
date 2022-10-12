@@ -29,4 +29,9 @@ export interface IBusinessUseCase {
     transactionManager: any
   ): Promise<Business | undefined>;
   getManyBy(input: BusinessSearchInput): Promise<SLPaginationResult<Business>>;
+  getAppUserBusiness(appUser: AppUser): Promise<Business | undefined>;
+  getAppUserBusiness(
+    appUser: AppUser,
+    transactionManager: any
+  ): Promise<Business | undefined>;
 }

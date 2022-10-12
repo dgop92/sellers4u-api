@@ -1,17 +1,21 @@
-import { ErrorCode, RepositoryError } from "@common/errors";
+import { ApplicationError, ErrorCode } from "@common/errors";
 import { AppLogger } from "@common/logging/logger";
 import {
   createTestLogger,
   WinstonLogger,
 } from "@common/logging/winston-logger";
+import { AppUser } from "@features/auth/entities/app-user";
 import { BusinessEntity } from "@features/business/infrastructure/orm/entities/business.orm";
+import { BusinessRepository } from "@features/business/infrastructure/orm/repositories/business.repository";
+import { BusinessUseCase } from "@features/business/use-cases/business.use-case";
 import { Product } from "@features/product/entities/product";
 import { CategoryEntity } from "@features/product/infrastructure/orm/entities/category.orm";
 import { ProductEntity } from "@features/product/infrastructure/orm/entities/product.orm";
 import { ProductRepository } from "@features/product/infrastructure/orm/repositories/product.repository";
+import { ProductUseCase } from "@features/product/use-cases/product.use-case";
 import { TestDBHelper } from "test/test-db-helper";
 import {
-  createTestBusiness,
+  createTestBusinessWithAppUser,
   createTestCategory,
   TEST_PRODUCTS,
 } from "../mocks/test-data";
@@ -20,8 +24,11 @@ const logger = createTestLogger();
 const winstonLogger = new WinstonLogger(logger);
 AppLogger.getAppLogger().setLogger(winstonLogger);
 
-describe("product repository", () => {
+describe("product use-case", () => {
   let productRepository: ProductRepository;
+  let productUseCase: ProductUseCase;
+  let appUser1: AppUser;
+  let appUser2: AppUser;
   let business1: BusinessEntity;
   let business2: BusinessEntity;
   let category1: CategoryEntity;
@@ -29,11 +36,25 @@ describe("product repository", () => {
 
   beforeAll(async () => {
     await TestDBHelper.instance.setupTestDB();
-    await TestDBHelper.instance.clear();
     productRepository = new ProductRepository(TestDBHelper.instance.datasource);
+    const businessRepository = new BusinessRepository(
+      TestDBHelper.instance.datasource
+    );
+    const businessUseCase = new BusinessUseCase(businessRepository);
+    productUseCase = new ProductUseCase(productRepository, businessUseCase);
 
-    business1 = await createTestBusiness(TestDBHelper.instance.datasource, 1);
-    business2 = await createTestBusiness(TestDBHelper.instance.datasource, 2);
+    const businessAppUser1 = await createTestBusinessWithAppUser(
+      TestDBHelper.instance.datasource,
+      1
+    );
+    const businessAppUser2 = await createTestBusinessWithAppUser(
+      TestDBHelper.instance.datasource,
+      2
+    );
+    business1 = businessAppUser1.business;
+    business2 = businessAppUser2.business;
+    appUser1 = businessAppUser1.appUser;
+    appUser2 = businessAppUser2.appUser;
     category1 = await createTestCategory(TestDBHelper.instance.datasource, 1);
     category2 = await createTestCategory(TestDBHelper.instance.datasource, 2);
   });
@@ -53,45 +74,38 @@ describe("product repository", () => {
     });
 
     it("should create a product", async () => {
-      const inputData = TEST_PRODUCTS.product2;
-      const product = await productRepository.create({
-        ...inputData,
-        businessId: business1.id,
-        categoryId: category1.id,
-      });
-      expect(product).toMatchObject(inputData);
-
+      const product = await productUseCase.create(
+        {
+          data: {
+            ...TEST_PRODUCTS.product2,
+            businessId: business1.id,
+            categoryId: category1.id,
+          },
+        },
+        appUser1
+      );
+      expect(product).toMatchObject(TEST_PRODUCTS.product2);
       const productRetrieved = await productRepository.getOneBy({
         searchBy: { id: product.id },
       });
       expect(productRetrieved).toBeDefined();
     });
-    it("should create a product with the same code use in another business", async () => {
-      const inputData = TEST_PRODUCTS.product1;
-      const product = await productRepository.create({
-        ...inputData,
-        businessId: business2.id,
-        categoryId: category1.id,
-      });
-      expect(product).toMatchObject(inputData);
-
-      const productRetrieved = await productRepository.getOneBy({
-        searchBy: { id: product.id },
-      });
-      expect(productRetrieved).toBeDefined();
-    });
-    it("should throw an error if product with given code already exists inside a business", async () => {
+    it("should throw an error if try to create a product in a business that doesn't belong to you", async () => {
       try {
-        await productRepository.create({
-          ...TEST_PRODUCTS.product1,
-          businessId: business1.id,
-          categoryId: category1.id,
-        });
+        await productUseCase.create(
+          {
+            data: {
+              ...TEST_PRODUCTS.product1,
+              businessId: business1.id,
+              categoryId: category1.id,
+            },
+          },
+          appUser2
+        );
       } catch (error) {
-        expect(error).toBeInstanceOf(RepositoryError);
-        if (error instanceof RepositoryError) {
-          expect(error.errorCode).toBe(ErrorCode.DUPLICATED_RECORD);
-          expect(error.message).toMatch(/code/i);
+        expect(error).toBeInstanceOf(ApplicationError);
+        if (error instanceof ApplicationError) {
+          expect(error.errorCode).toBe(ErrorCode.FORBIDDEN);
         }
       }
     });
@@ -109,46 +123,20 @@ describe("product repository", () => {
       });
     });
 
-    it("should update basic product data", async () => {
+    it("should update a product", async () => {
       const inputData = {
+        name: "test product updated",
         description: "test product description updated",
-        price: 10000,
-        code: "test-product-code-updated",
       };
-      const product = await productRepository.update(product1, inputData);
-      const productRetrieved = await productRepository.getOneBy({
-        searchBy: { id: product.id },
-      });
-      expect(productRetrieved).toMatchObject({
-        ...inputData,
-        id: product.id,
-      });
-    });
-    /* it("should update a product category", async () => {
-      const inputData = {
-        categoryId: category2.id,
-      };
-      await productRepository.update(product1, inputData);
+      const product = await productUseCase.update(
+        {
+          data: inputData,
+          searchBy: { id: product1.id },
+        },
+        appUser1
+      );
 
       const productRetrieved = await productRepository.getOneBy({
-        searchBy: { id: product1.id },
-        options: { fetchCategory: true },
-      });
-      expect(productRetrieved?.category?.id).toBe(category2.id);
-    }); */
-    it("should update a product with the same code use in another business", async () => {
-      const initialProduct = await productRepository.create({
-        ...TEST_PRODUCTS.product2,
-        businessId: business2.id,
-        categoryId: category1.id,
-      });
-      const inputData = {
-        name: "test product updated",
-        code: product1.code,
-        description: "test product description updated",
-      };
-      const product = await productRepository.update(initialProduct, inputData);
-      const productRetrieved = await productRepository.getOneBy({
         searchBy: { id: product.id },
       });
       expect(productRetrieved).toMatchObject({
@@ -156,23 +144,43 @@ describe("product repository", () => {
         id: product.id,
       });
     });
-    it("should throw an error if try to update a product with a code that is already in use", async () => {
-      await productRepository.create({
-        ...TEST_PRODUCTS.product2,
-        businessId: business1.id,
-        categoryId: category1.id,
-      });
-      const inputData = {
-        name: "test product updated",
-        code: TEST_PRODUCTS.product2.code,
-      };
+    it("should throw an error if try to update a product in a business that doesn't belong to you", async () => {
       try {
-        await productRepository.update(product1, inputData);
+        const inputData = {
+          name: "test product updated",
+          description: "test product description updated",
+        };
+        await productUseCase.update(
+          {
+            data: inputData,
+            searchBy: { id: product1.id },
+          },
+          appUser2
+        );
       } catch (error) {
-        expect(error).toBeInstanceOf(RepositoryError);
-        if (error instanceof RepositoryError) {
-          expect(error.errorCode).toBe(ErrorCode.DUPLICATED_RECORD);
-          expect(error.message).toMatch(/code/i);
+        expect(error).toBeInstanceOf(ApplicationError);
+        if (error instanceof ApplicationError) {
+          expect(error.errorCode).toBe(ErrorCode.NOT_FOUND);
+        }
+      }
+    });
+    it("should throw an error if product is not found", async () => {
+      try {
+        const inputData = {
+          name: "test product updated",
+          description: "test product description updated",
+        };
+        await productUseCase.update(
+          {
+            data: inputData,
+            searchBy: { id: 1234 },
+          },
+          appUser2
+        );
+      } catch (error) {
+        expect(error).toBeInstanceOf(ApplicationError);
+        if (error instanceof ApplicationError) {
+          expect(error.errorCode).toBe(ErrorCode.NOT_FOUND);
         }
       }
     });
@@ -191,11 +199,31 @@ describe("product repository", () => {
     });
 
     it("should delete a product", async () => {
-      await productRepository.delete(product1);
+      await productUseCase.delete({ id: product1.id }, appUser1);
       const productRetrieved = await productRepository.getOneBy({
         searchBy: { id: product1.id },
       });
       expect(productRetrieved).toBeUndefined();
+    });
+    it("should throw an error if try to delete a product in a business that doesn't belong to you", async () => {
+      try {
+        await productUseCase.delete({ id: product1.id }, appUser2);
+      } catch (error) {
+        expect(error).toBeInstanceOf(ApplicationError);
+        if (error instanceof ApplicationError) {
+          expect(error.errorCode).toBe(ErrorCode.NOT_FOUND);
+        }
+      }
+    });
+    it("should throw an error if product is not found", async () => {
+      try {
+        await productUseCase.delete({ id: 1234 }, appUser2);
+      } catch (error) {
+        expect(error).toBeInstanceOf(ApplicationError);
+        if (error instanceof ApplicationError) {
+          expect(error.errorCode).toBe(ErrorCode.NOT_FOUND);
+        }
+      }
     });
   });
 
@@ -209,87 +237,57 @@ describe("product repository", () => {
         businessId: business1.id,
         categoryId: category1.id,
       });
-      await productRepository.create({
-        ...TEST_PRODUCTS.product2,
-        businessId: business1.id,
-        categoryId: category2.id,
-      });
-      await productRepository.create({
-        ...TEST_PRODUCTS.product3,
-        businessId: business2.id,
-        categoryId: category1.id,
-      });
     });
 
     it("should get a product by id", async () => {
-      const productRetrieved = await productRepository.getOneBy({
+      const productRetrieved = await productUseCase.getOneBy({
         searchBy: { id: product1.id },
       });
       expect(productRetrieved).toBeDefined();
-      expect(productRetrieved).toMatchObject(TEST_PRODUCTS.product1);
     });
     it("should get a product by name", async () => {
-      const productRetrieved = await productRepository.getOneBy({
-        searchBy: { name: "product1" },
+      const productRetrieved = await productUseCase.getOneBy({
+        searchBy: { name: product1.name },
       });
       expect(productRetrieved).toBeDefined();
-      expect(productRetrieved).toMatchObject(TEST_PRODUCTS.product1);
     });
     it("should get a product by code", async () => {
-      const productRetrieved = await productRepository.getOneBy({
+      const productRetrieved = await productUseCase.getOneBy({
         searchBy: { code: "product1-code" },
       });
       expect(productRetrieved).toBeDefined();
       expect(productRetrieved).toMatchObject(TEST_PRODUCTS.product1);
     });
     it("should get a product by id and businessId", async () => {
-      const productRetrieved = await productRepository.getOneBy({
+      const productRetrieved = await productUseCase.getOneBy({
         searchBy: { id: product1.id, businessId: business1.id },
       });
       expect(productRetrieved).toBeDefined();
       expect(productRetrieved).toMatchObject(TEST_PRODUCTS.product1);
     });
     it("should not get a product by id", async () => {
-      const productRetrieved = await productRepository.getOneBy({
+      const productRetrieved = await productUseCase.getOneBy({
         searchBy: { id: 123 },
       });
       expect(productRetrieved).toBeUndefined();
     });
     it("should not get a product by name", async () => {
-      const productRetrieved = await productRepository.getOneBy({
+      const productRetrieved = await productUseCase.getOneBy({
         searchBy: { name: "asdasdnmaueygasd" },
       });
       expect(productRetrieved).toBeUndefined();
     });
     it("should not get a product by code", async () => {
-      const productRetrieved = await productRepository.getOneBy({
+      const productRetrieved = await productUseCase.getOneBy({
         searchBy: { code: "product1-code-asdasd" },
       });
       expect(productRetrieved).toBeUndefined();
     });
     it("should not get a product by id and businessId", async () => {
-      const productRetrieved = await productRepository.getOneBy({
+      const productRetrieved = await productUseCase.getOneBy({
         searchBy: { id: product1.id, businessId: business2.id },
       });
       expect(productRetrieved).toBeUndefined();
-    });
-    it("should get a product by id and load its category", async () => {
-      const productRetrieved = await productRepository.getOneBy({
-        searchBy: { id: product1.id },
-        options: { fetchCategory: true },
-      });
-      expect(productRetrieved).toBeDefined();
-      expect(productRetrieved?.category).toBeDefined();
-      expect(productRetrieved?.category?.id).toBe(category1.id);
-    });
-    it("should get a product by id and load its business", async () => {
-      const productRetrieved = await productRepository.getOneBy({
-        searchBy: { id: product1.id },
-        options: { fetchBusiness: true },
-      });
-      expect(productRetrieved).toBeDefined();
-      expect(productRetrieved?.business).toBeDefined();
-      expect(productRetrieved?.business?.id).toBe(business1.id);
     });
   });
 
@@ -316,12 +314,12 @@ describe("product repository", () => {
     });
 
     it("should get all products", async () => {
-      const productsRetrieved = await productRepository.getManyBy({});
+      const productsRetrieved = await productUseCase.getManyBy({});
       expect(productsRetrieved.count).toBe(3);
       expect(productsRetrieved.results).toHaveLength(3);
     });
     it("should get all products and load it categories", async () => {
-      const productsRetrieved = await productRepository.getManyBy({
+      const productsRetrieved = await productUseCase.getManyBy({
         options: { fetchCategory: true },
       });
       expect(productsRetrieved.count).toBe(3);
@@ -330,7 +328,7 @@ describe("product repository", () => {
       categories.forEach((c) => expect(c).toBeDefined());
     });
     it("should get all products and load it business", async () => {
-      const productsRetrieved = await productRepository.getManyBy({
+      const productsRetrieved = await productUseCase.getManyBy({
         options: { fetchBusiness: true },
       });
       expect(productsRetrieved.count).toBe(3);
@@ -338,15 +336,8 @@ describe("product repository", () => {
       const businesses = productsRetrieved.results.map((p) => p.business);
       businesses.forEach((b) => expect(b).toBeDefined());
     });
-    it("should get all products with pagination", async () => {
-      const productsRetrieved = await productRepository.getManyBy({
-        pagination: { limit: 2, skip: 1 },
-      });
-      expect(productsRetrieved.count).toBe(2);
-      expect(productsRetrieved.results).toHaveLength(2);
-    });
     it("should get all products with name product", async () => {
-      const productsRetrieved = await productRepository.getManyBy({
+      const productsRetrieved = await productUseCase.getManyBy({
         searchBy: { name: "product" },
       });
       expect(productsRetrieved.count).toBe(2);
@@ -357,7 +348,7 @@ describe("product repository", () => {
       );
     });
     it("should get all products containing 'anormal' in description", async () => {
-      const productsRetrieved = await productRepository.getManyBy({
+      const productsRetrieved = await productUseCase.getManyBy({
         searchBy: { description: "anormal" },
       });
       expect(productsRetrieved.count).toBe(1);
@@ -367,7 +358,7 @@ describe("product repository", () => {
       );
     });
     it("should get all products filter by business ", async () => {
-      const productsRetrieved = await productRepository.getManyBy({
+      const productsRetrieved = await productUseCase.getManyBy({
         searchBy: { businessId: business1.id },
         options: { fetchBusiness: true },
       });
@@ -377,7 +368,7 @@ describe("product repository", () => {
       expect(businessIds.sort()).toEqual([business1.id, business1.id].sort());
     });
     it("should get all products filter by category ", async () => {
-      const productsRetrieved = await productRepository.getManyBy({
+      const productsRetrieved = await productUseCase.getManyBy({
         searchBy: { categoryId: category1.id },
         options: { fetchCategory: true },
       });
@@ -387,7 +378,7 @@ describe("product repository", () => {
       expect(categoryIds.sort()).toEqual([category1.id, category1.id].sort());
     });
     it("should get all products with price gte 200", async () => {
-      const productsRetrieved = await productRepository.getManyBy({
+      const productsRetrieved = await productUseCase.getManyBy({
         filterBy: { price: { min: 200 } },
       });
       expect(productsRetrieved.count).toBe(2);
@@ -398,7 +389,7 @@ describe("product repository", () => {
       );
     });
     it("should get all products with price lte 400", async () => {
-      const productsRetrieved = await productRepository.getManyBy({
+      const productsRetrieved = await productUseCase.getManyBy({
         filterBy: { price: { max: 400 } },
       });
       expect(productsRetrieved.count).toBe(2);
@@ -409,7 +400,7 @@ describe("product repository", () => {
       );
     });
     it("should get all products with price gte 150 and lte 450", async () => {
-      const productsRetrieved = await productRepository.getManyBy({
+      const productsRetrieved = await productUseCase.getManyBy({
         filterBy: { price: { max: 450, min: 150 } },
       });
       expect(productsRetrieved.count).toBe(1);

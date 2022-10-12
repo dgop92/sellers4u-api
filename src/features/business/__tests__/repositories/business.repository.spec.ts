@@ -104,7 +104,7 @@ describe("business repository", () => {
   describe("Get one by", () => {
     let business1: Business;
 
-    beforeEach(async () => {
+    beforeAll(async () => {
       await TestDBHelper.instance.clear();
       appUser1 = await appUserRepository.create(TEST_APP_USERS.appUserTest1);
       business1 = await businessRepository.create(
@@ -161,16 +161,15 @@ describe("business repository", () => {
   });
 
   describe("Get many by", () => {
-    let business: Business[];
     let appUser2: AppUser;
     let appUser3: AppUser;
 
-    beforeEach(async () => {
+    beforeAll(async () => {
       await TestDBHelper.instance.clear();
       appUser1 = await appUserRepository.create(TEST_APP_USERS.appUserTest1);
       appUser2 = await appUserRepository.create(TEST_APP_USERS.appUserTest2);
       appUser3 = await appUserRepository.create(TEST_APP_USERS.appUserTest3);
-      business = await Promise.all([
+      await Promise.all([
         businessRepository.create(TEST_BUSINESS.business1, appUser1),
         businessRepository.create(TEST_BUSINESS.business2, appUser2),
         businessRepository.create(TEST_BUSINESS.business3, appUser3),

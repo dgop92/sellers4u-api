@@ -55,9 +55,9 @@ export class ProductRepository
       return productEntityToDomain(productEntity);
     } catch (error) {
       if (error instanceof QueryFailedError) {
-        if (error.driverError.constraint === "unique_code") {
+        if (error.driverError.constraint === "unique_business_code") {
           throw new RepositoryError(
-            "product with given code already exists",
+            "product with given code inside this business already exists",
             ErrorCode.DUPLICATED_RECORD,
             { fieldName: "code" }
           );

@@ -1,4 +1,5 @@
 import { AppUserEntity } from "@features/auth/infrastructure/orm/entities/app-user.orm";
+import { appUserEntityToDomain } from "@features/auth/infrastructure/orm/transformers";
 import { BusinessEntity } from "@features/business/infrastructure/orm/entities/business.orm";
 import { CategoryEntity } from "@features/product/infrastructure/orm/entities/category.orm";
 import { DataSource } from "typeorm";
@@ -70,6 +71,24 @@ export async function createTestBusiness(
     appUser: appUserEntity,
   });
   return business;
+}
+
+export async function createTestBusinessWithAppUser(
+  datasource: DataSource,
+  identifier: number
+) {
+  const appUserRepository = datasource.getRepository(AppUserEntity);
+  const businessRepository = datasource.getRepository(BusinessEntity);
+  const appUserEntity = await appUserRepository.save({
+    firstName: `test-fr-${identifier}`,
+    lastName: `test-lt-${identifier}`,
+    firebaseUserId: `G1J2tcEfOFYBycm8ZcXi9tZjN85${identifier}`,
+  });
+  const business = await businessRepository.save({
+    name: `test business ${identifier}`,
+    appUser: appUserEntity,
+  });
+  return { business, appUser: appUserEntityToDomain(appUserEntity) };
 }
 
 export async function createTestCategory(

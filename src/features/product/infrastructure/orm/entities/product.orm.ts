@@ -14,7 +14,7 @@ import { CategoryEntity } from "./category.orm";
 import { ProductPhotoEntity } from "./product-photo.orm";
 
 @Entity()
-@Unique("unique_code", ["code"])
+@Unique("unique_business_code", ["code", "business"])
 export class ProductEntity {
   @PrimaryGeneratedColumn()
   id: number;

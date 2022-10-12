@@ -41,6 +41,8 @@ export interface ProductSearchInput {
   options?: ProductOptions;
   pagination?: ProductPagination;
   searchBy?: {
+    businessId?: number;
+    categoryId?: number;
     code?: string;
     description?: string;
     id?: number;
