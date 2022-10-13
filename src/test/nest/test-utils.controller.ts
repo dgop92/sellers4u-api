@@ -75,16 +75,17 @@ export class TestUtilControllerV1 {
   async setupData(@Body() body: SetupDataBody) {
     if (!APP_ENV_VARS.isProduction) {
       myLogger.debug("setting up data", body);
+      let result;
       const { moduleToSetup } = body;
       switch (moduleToSetup) {
         case "auth":
-          await setupAuthModuleData();
+          result = await setupAuthModuleData();
           break;
         case "business":
-          await setupBusinessModuleData();
+          result = await setupBusinessModuleData();
           break;
         case "product":
-          await setupProductModuleData();
+          result = await setupProductModuleData();
         default:
           throw new HttpException(
             {
@@ -95,7 +96,7 @@ export class TestUtilControllerV1 {
           );
       }
       myLogger.debug("data setup done");
-      return { setupSuccessful: true };
+      return result;
     }
     throw new HttpException(
       {

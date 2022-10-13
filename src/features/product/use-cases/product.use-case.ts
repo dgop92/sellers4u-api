@@ -22,13 +22,15 @@ import { ApplicationError, ErrorCode } from "@common/errors";
 import { AppUser } from "@features/auth/entities/app-user";
 import { IBusinessUseCase } from "@features/business/ports/business.use-case.definition";
 import { IntegerLookUpInputSchema } from "@common/schemas/idValidations";
+import { ICategoryUseCase } from "../ports/category.use-case.definition";
 
 const myLogger = AppLogger.getAppLogger().createFileLogger(__filename);
 
 export class ProductUseCase implements IProductUseCase {
   constructor(
     private readonly repository: IProductRepository,
-    private readonly businessUseCase: IBusinessUseCase
+    private readonly businessUseCase: IBusinessUseCase,
+    private readonly categoryUseCase: ICategoryUseCase
   ) {}
 
   private async checkIfAppUserIsOwnerOfBusiness(
@@ -103,7 +105,7 @@ export class ProductUseCase implements IProductUseCase {
     const product = await this.repository.getOneBy(
       {
         searchBy: { id: input.searchBy.id, businessId: business.id },
-        options: { fetchBusiness: true },
+        options: { fetchBusiness: true, fetchCategory: true },
       },
       transactionManager
     );
@@ -112,6 +114,24 @@ export class ProductUseCase implements IProductUseCase {
       throw new ApplicationError("product not found", ErrorCode.NOT_FOUND);
     }
     myLogger.debug("product found", { id: input.searchBy.id });
+
+    if (input.data.categoryId) {
+      myLogger.debug("updating category", {
+        oldId: product!.category!.id,
+        newId: input.data.categoryId,
+      });
+      const newCategory = await this.categoryUseCase.getOneBy(
+        { searchBy: { id: input.data.categoryId } },
+        transactionManager
+      );
+      if (!newCategory) {
+        throw new ApplicationError(
+          "new category to update not found",
+          ErrorCode.NOT_FOUND
+        );
+      }
+      product.category = newCategory;
+    }
 
     return this.repository.update(product, input.data, transactionManager);
   }

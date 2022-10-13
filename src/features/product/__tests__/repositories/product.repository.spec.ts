@@ -8,12 +8,14 @@ import { BusinessEntity } from "@features/business/infrastructure/orm/entities/b
 import { Product } from "@features/product/entities/product";
 import { CategoryEntity } from "@features/product/infrastructure/orm/entities/category.orm";
 import { ProductEntity } from "@features/product/infrastructure/orm/entities/product.orm";
+import { ProductPhotoRepository } from "@features/product/infrastructure/orm/repositories/product-photo.repository";
 import { ProductRepository } from "@features/product/infrastructure/orm/repositories/product.repository";
 import { TestDBHelper } from "test/test-db-helper";
 import {
   createTestBusiness,
   createTestCategory,
   TEST_PRODUCTS,
+  TEST_PRODUCT_PHOTOS,
 } from "../mocks/test-data";
 
 const logger = createTestLogger();
@@ -22,6 +24,7 @@ AppLogger.getAppLogger().setLogger(winstonLogger);
 
 describe("product repository", () => {
   let productRepository: ProductRepository;
+  let productPhotoRepository: ProductPhotoRepository;
   let business1: BusinessEntity;
   let business2: BusinessEntity;
   let category1: CategoryEntity;
@@ -31,6 +34,9 @@ describe("product repository", () => {
     await TestDBHelper.instance.setupTestDB();
     await TestDBHelper.instance.clear();
     productRepository = new ProductRepository(TestDBHelper.instance.datasource);
+    productPhotoRepository = new ProductPhotoRepository(
+      TestDBHelper.instance.datasource
+    );
 
     business1 = await createTestBusiness(TestDBHelper.instance.datasource, 1);
     business2 = await createTestBusiness(TestDBHelper.instance.datasource, 2);
@@ -124,18 +130,6 @@ describe("product repository", () => {
         id: product.id,
       });
     });
-    /* it("should update a product category", async () => {
-      const inputData = {
-        categoryId: category2.id,
-      };
-      await productRepository.update(product1, inputData);
-
-      const productRetrieved = await productRepository.getOneBy({
-        searchBy: { id: product1.id },
-        options: { fetchCategory: true },
-      });
-      expect(productRetrieved?.category?.id).toBe(category2.id);
-    }); */
     it("should update a product with the same code use in another business", async () => {
       const initialProduct = await productRepository.create({
         ...TEST_PRODUCTS.product2,
@@ -209,7 +203,7 @@ describe("product repository", () => {
         businessId: business1.id,
         categoryId: category1.id,
       });
-      await productRepository.create({
+      const product2 = await productRepository.create({
         ...TEST_PRODUCTS.product2,
         businessId: business1.id,
         categoryId: category2.id,
@@ -218,6 +212,18 @@ describe("product repository", () => {
         ...TEST_PRODUCTS.product3,
         businessId: business2.id,
         categoryId: category1.id,
+      });
+      await productPhotoRepository.create({
+        productId: product1.id,
+        ...TEST_PRODUCT_PHOTOS.productPhoto1,
+      });
+      await productPhotoRepository.create({
+        productId: product1.id,
+        ...TEST_PRODUCT_PHOTOS.productPhoto2,
+      });
+      await productPhotoRepository.create({
+        productId: product2.id,
+        ...TEST_PRODUCT_PHOTOS.productPhoto3,
       });
     });
 
@@ -290,6 +296,23 @@ describe("product repository", () => {
       expect(productRetrieved).toBeDefined();
       expect(productRetrieved?.business).toBeDefined();
       expect(productRetrieved?.business?.id).toBe(business1.id);
+    });
+    it("should get a product by id and load its photos", async () => {
+      const productRetrieved = await productRepository.getOneBy({
+        searchBy: { id: product1.id },
+        options: { fetchPhotos: true },
+      });
+      expect(productRetrieved).toBeDefined();
+      expect(productRetrieved?.photos).toBeDefined();
+      const photoImageIds = productRetrieved?.photos?.map(
+        (photo) => photo.imageId
+      );
+      expect(photoImageIds).toContain(
+        TEST_PRODUCT_PHOTOS.productPhoto1.imageId
+      );
+      expect(photoImageIds).toContain(
+        TEST_PRODUCT_PHOTOS.productPhoto2.imageId
+      );
     });
   });
 

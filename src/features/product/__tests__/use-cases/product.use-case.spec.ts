@@ -11,7 +11,9 @@ import { BusinessUseCase } from "@features/business/use-cases/business.use-case"
 import { Product } from "@features/product/entities/product";
 import { CategoryEntity } from "@features/product/infrastructure/orm/entities/category.orm";
 import { ProductEntity } from "@features/product/infrastructure/orm/entities/product.orm";
+import { CategoryRepository } from "@features/product/infrastructure/orm/repositories/category.repository";
 import { ProductRepository } from "@features/product/infrastructure/orm/repositories/product.repository";
+import { CategoryUseCase } from "@features/product/use-cases/category.use-case";
 import { ProductUseCase } from "@features/product/use-cases/product.use-case";
 import { TestDBHelper } from "test/test-db-helper";
 import {
@@ -40,8 +42,16 @@ describe("product use-case", () => {
     const businessRepository = new BusinessRepository(
       TestDBHelper.instance.datasource
     );
+    const categoryRepository = new CategoryRepository(
+      TestDBHelper.instance.datasource
+    );
     const businessUseCase = new BusinessUseCase(businessRepository);
-    productUseCase = new ProductUseCase(productRepository, businessUseCase);
+    const categoryUseCase = new CategoryUseCase(categoryRepository);
+    productUseCase = new ProductUseCase(
+      productRepository,
+      businessUseCase,
+      categoryUseCase
+    );
 
     const businessAppUser1 = await createTestBusinessWithAppUser(
       TestDBHelper.instance.datasource,
@@ -143,6 +153,39 @@ describe("product use-case", () => {
         ...inputData,
         id: product.id,
       });
+    });
+    it("should update a product category", async () => {
+      const inputData = {
+        categoryId: category2.id,
+      };
+      await productUseCase.update(
+        { data: inputData, searchBy: { id: product1.id } },
+        appUser1
+      );
+
+      const productRetrieved = await productRepository.getOneBy({
+        searchBy: { id: product1.id },
+        options: { fetchCategory: true },
+      });
+      expect(productRetrieved?.category?.id).toBe(category2.id);
+    });
+    it("should throw an error if try to update a product with a category that does not exit", async () => {
+      try {
+        await productUseCase.update(
+          {
+            data: {
+              categoryId: 1425,
+            },
+            searchBy: { id: product1.id },
+          },
+          appUser1
+        );
+      } catch (error) {
+        expect(error).toBeInstanceOf(ApplicationError);
+        if (error instanceof ApplicationError) {
+          expect(error.errorCode).toBe(ErrorCode.NOT_FOUND);
+        }
+      }
     });
     it("should throw an error if try to update a product in a business that doesn't belong to you", async () => {
       try {

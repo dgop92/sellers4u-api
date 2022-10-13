@@ -18,6 +18,8 @@ import {
   Patch,
   Delete,
   Query,
+  Param,
+  ParseIntPipe,
 } from "@nestjs/common";
 
 type CreateBusinessRequest = BusinessCreateInput["data"];
@@ -53,6 +55,22 @@ export class BusinessControllerV1 {
       pagination: { limit: query?.limit, skip: query?.skip },
       options: { fetchOwner: query?.fetchOwner },
     });
+  }
+
+  @UseGuards(UserGuard)
+  @Get("/:id")
+  async getOne(
+    @Param("id", ParseIntPipe) id: number,
+    @Query() query: BusinessSearchInput["options"]
+  ) {
+    const business = await this.businessUseCase.getOneBy({
+      searchBy: { id },
+      options: { fetchOwner: query?.fetchOwner },
+    });
+    if (!business) {
+      throw new PresentationError("business not found", ErrorCode.NOT_FOUND);
+    }
+    return business;
   }
 
   @UseGuards(UserGuard)
