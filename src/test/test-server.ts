@@ -4,20 +4,19 @@ import { WinstonLogger, createDevLogger } from "@common/logging/winston-logger";
 import { HttpAdapterHost, NestFactory } from "@nestjs/core";
 import { VersioningType } from "@nestjs/common";
 import { AllExceptionsFilter } from "../main/nest/general-exception-filter";
-import { authFactory } from "@features/auth/factories";
-import { businessModuleFactory } from "@features/business/factories";
 import { APP_ENV_VARS } from "@common/config/app-env-vars";
-import { productModuleFactory } from "@features/product/factories";
 import { TestDBHelper } from "test/test-db-helper";
 import { TestModule } from "./nest/test.module";
+import { setupFactories } from "main/setup-factories";
+import { createAppCategories } from "@features/product/factories/category/create-categories";
 
 export async function startTestApp() {
   await TestDBHelper.instance.setupTestDB();
   const dataSource = TestDBHelper.instance.datasource;
 
-  authFactory(dataSource);
-  businessModuleFactory(dataSource);
-  productModuleFactory(dataSource);
+  setupFactories(dataSource);
+
+  await createAppCategories();
 
   const app = await NestFactory.create(TestModule);
   const httpAdapterHost = app.get(HttpAdapterHost);

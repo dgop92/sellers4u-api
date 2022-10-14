@@ -47,11 +47,8 @@ describe("product use-case", () => {
     );
     const businessUseCase = new BusinessUseCase(businessRepository);
     const categoryUseCase = new CategoryUseCase(categoryRepository);
-    productUseCase = new ProductUseCase(
-      productRepository,
-      businessUseCase,
-      categoryUseCase
-    );
+    productUseCase = new ProductUseCase(productRepository);
+    productUseCase.setDependencies(businessUseCase, categoryUseCase);
 
     const businessAppUser1 = await createTestBusinessWithAppUser(
       TestDBHelper.instance.datasource,

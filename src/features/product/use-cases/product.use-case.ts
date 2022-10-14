@@ -27,11 +27,18 @@ import { ICategoryUseCase } from "../ports/category.use-case.definition";
 const myLogger = AppLogger.getAppLogger().createFileLogger(__filename);
 
 export class ProductUseCase implements IProductUseCase {
-  constructor(
-    private readonly repository: IProductRepository,
-    private readonly businessUseCase: IBusinessUseCase,
-    private readonly categoryUseCase: ICategoryUseCase
-  ) {}
+  private businessUseCase: IBusinessUseCase;
+  private categoryUseCase: ICategoryUseCase;
+
+  constructor(private readonly repository: IProductRepository) {}
+
+  setDependencies(
+    businessUseCase: IBusinessUseCase,
+    categoryUseCase: ICategoryUseCase
+  ) {
+    this.businessUseCase = businessUseCase;
+    this.categoryUseCase = categoryUseCase;
+  }
 
   private async checkIfAppUserIsOwnerOfBusiness(
     appUser: AppUser,

@@ -21,6 +21,8 @@ function getStatusCodeFromErrorCode(errorCode: ErrorCode) {
       return HttpStatus.CONFLICT;
     case ErrorCode.UNAUTHORIZED:
       return HttpStatus.UNAUTHORIZED;
+    case ErrorCode.FORBIDDEN:
+      return HttpStatus.FORBIDDEN;
     default:
       return HttpStatus.INTERNAL_SERVER_ERROR;
   }

@@ -34,7 +34,7 @@ export class CategoryControllerV1 {
   }
 
   @UseGuards(AuthUserGuard)
-  @Get("/:id")
+  @Get(":id")
   async getOne(@Param("id", ParseIntPipe) id: number) {
     const category = await this.categoryUseCase.getOneBy({
       searchBy: { id },

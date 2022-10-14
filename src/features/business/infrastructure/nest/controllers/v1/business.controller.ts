@@ -42,6 +42,23 @@ export class BusinessControllerV1 {
   }
 
   @UseGuards(UserGuard)
+  @Get("own")
+  async getOwn(
+    @GetUser() user: User,
+    @Query() query: BusinessSearchInput["options"]
+  ) {
+    console.log(query);
+    const business = await this.businessUseCase.getOneBy({
+      searchBy: { appUserId: user.appUser.id },
+      options: { fetchOwner: query?.fetchOwner },
+    });
+    if (!business) {
+      throw new PresentationError("business not found", ErrorCode.NOT_FOUND);
+    }
+    return business;
+  }
+
+  @UseGuards(UserGuard)
   @Post()
   create(@Body() data: CreateBusinessRequest, @GetUser() user: User) {
     return this.businessUseCase.create({ data }, user.appUser);
@@ -58,30 +75,13 @@ export class BusinessControllerV1 {
   }
 
   @UseGuards(UserGuard)
-  @Get("/:id")
+  @Get(":id")
   async getOne(
     @Param("id", ParseIntPipe) id: number,
     @Query() query: BusinessSearchInput["options"]
   ) {
     const business = await this.businessUseCase.getOneBy({
       searchBy: { id },
-      options: { fetchOwner: query?.fetchOwner },
-    });
-    if (!business) {
-      throw new PresentationError("business not found", ErrorCode.NOT_FOUND);
-    }
-    return business;
-  }
-
-  @UseGuards(UserGuard)
-  @Get("/own")
-  async getOwn(
-    @GetUser() user: User,
-    @Query() query: BusinessSearchInput["options"]
-  ) {
-    console.log(query);
-    const business = await this.businessUseCase.getOneBy({
-      searchBy: { appUserId: user.appUser.id },
       options: { fetchOwner: query?.fetchOwner },
     });
     if (!business) {

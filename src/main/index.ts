@@ -7,19 +7,15 @@ import { VersioningType } from "@nestjs/common";
 import { AppDataSource } from "./db/data-source";
 import { AppModule } from "./nest/app.module";
 import { AllExceptionsFilter } from "./nest/general-exception-filter";
-import { authFactory } from "@features/auth/factories";
-import { businessModuleFactory } from "@features/business/factories";
+import { setupFactories } from "./setup-factories";
 import { APP_ENV_VARS } from "@common/config/app-env-vars";
-import { productModuleFactory } from "@features/product/factories";
 import { createAppCategories } from "@features/product/factories/category/create-categories";
 
 export async function startApp() {
   const dataSource = await AppDataSource.initialize();
   await dataSource.runMigrations();
 
-  authFactory(dataSource);
-  businessModuleFactory(dataSource);
-  productModuleFactory(dataSource);
+  setupFactories(dataSource);
 
   await createAppCategories();
 
