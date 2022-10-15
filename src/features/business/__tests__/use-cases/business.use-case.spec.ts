@@ -5,9 +5,12 @@ import {
   WinstonLogger,
 } from "@common/logging/winston-logger";
 import { AppUser } from "@features/auth/entities/app-user";
-import { AppUserRepository } from "@features/auth/infrastructure/orm/repositories/app-user.repository";
+import { myAppUserFactory } from "@features/auth/factories/app-user.factory";
+import { IAppUserRepository } from "@features/auth/ports/app-user.repository.definition";
 import { Business } from "@features/business/entities/business";
-import { BusinessRepository } from "@features/business/infrastructure/orm/repositories/business.repository";
+import { myBusinessFactory } from "@features/business/factories/business.factory";
+import { IBusinessRepository } from "@features/business/ports/business.repository.definition";
+import { IBusinessUseCase } from "@features/business/ports/business.use-case.definition";
 import { BusinessUseCase } from "@features/business/use-cases/business.use-case";
 import { TestDBHelper } from "test/test-db-helper";
 import { TEST_APP_USERS, TEST_BUSINESS } from "../mocks/test-data";
@@ -19,18 +22,21 @@ AppLogger.getAppLogger().setLogger(winstonLogger);
 // Note userId is mock in order to not use firebase
 
 describe("business use-case", () => {
-  let businessRepository: BusinessRepository;
-  let businessUseCase: BusinessUseCase;
-  let appUserRepository: AppUserRepository;
+  let businessRepository: IBusinessRepository;
+  let businessUseCase: IBusinessUseCase;
+  let appUserRepository: IAppUserRepository;
   let appUser1: AppUser;
 
   beforeAll(async () => {
     await TestDBHelper.instance.setupTestDB();
-    businessRepository = new BusinessRepository(
-      TestDBHelper.instance.datasource
-    );
-    businessUseCase = new BusinessUseCase(businessRepository);
-    appUserRepository = new AppUserRepository(TestDBHelper.instance.datasource);
+    const ds = TestDBHelper.instance.datasource;
+
+    const appUserFactory = myAppUserFactory(ds);
+    const businessFactory = myBusinessFactory(ds);
+
+    appUserRepository = appUserFactory.appUserRepository;
+    businessRepository = businessFactory.businessRepository;
+    businessUseCase = businessFactory.businessUseCase;
   });
 
   afterAll(async () => {

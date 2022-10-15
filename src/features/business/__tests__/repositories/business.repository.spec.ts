@@ -4,8 +4,10 @@ import {
   WinstonLogger,
 } from "@common/logging/winston-logger";
 import { AppUser } from "@features/auth/entities/app-user";
+import { myAppUserFactory } from "@features/auth/factories/app-user.factory";
 import { AppUserRepository } from "@features/auth/infrastructure/orm/repositories/app-user.repository";
 import { Business } from "@features/business/entities/business";
+import { myBusinessFactory } from "@features/business/factories/business.factory";
 import { BusinessRepository } from "@features/business/infrastructure/orm/repositories/business.repository";
 import { TestDBHelper } from "test/test-db-helper";
 import { TEST_APP_USERS, TEST_BUSINESS } from "../mocks/test-data";
@@ -23,10 +25,12 @@ describe("business repository", () => {
 
   beforeAll(async () => {
     await TestDBHelper.instance.setupTestDB();
-    businessRepository = new BusinessRepository(
-      TestDBHelper.instance.datasource
-    );
-    appUserRepository = new AppUserRepository(TestDBHelper.instance.datasource);
+    const ds = TestDBHelper.instance.datasource;
+    const appUserFactory = myAppUserFactory(ds);
+    appUserRepository = appUserFactory.appUserRepository as AppUserRepository;
+    const businessFactory = myBusinessFactory(ds);
+    businessRepository =
+      businessFactory.businessRepository as BusinessRepository;
   });
 
   afterAll(async () => {
