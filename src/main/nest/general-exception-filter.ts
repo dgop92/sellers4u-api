@@ -73,14 +73,24 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
 
     const internalErrorStatusCode = HttpStatus.INTERNAL_SERVER_ERROR;
-    const message =
-      exception instanceof Error ? exception.message : "unknown error";
+    let errorMessage = "unknown error";
+
+    if (typeof exception === "object" && exception !== null) {
+      if (exception.hasOwnProperty("message")) {
+        // @ts-ignore
+        errorMessage = exception.message;
+      }
+    }
+
+    if (exception instanceof Error) {
+      errorMessage = exception.message;
+    }
 
     const responseBody = {
       statusCode: internalErrorStatusCode,
       timestamp: currentTimestamp,
       path: httpAdapter.getRequestUrl(ctx.getRequest()),
-      message,
+      message: errorMessage,
     };
 
     httpAdapter.reply(ctx.getResponse(), responseBody, internalErrorStatusCode);

@@ -44,7 +44,10 @@ export class ProductPhotoRepository
     transactionManager?: EntityManager
   ): Promise<ProductPhoto> {
     try {
-      myLogger.debug("saving product photo in db");
+      myLogger.debug("saving product photo in db", {
+        productId: input.productId,
+        imageId: input.imageId,
+      });
       const productPhotoEntity = this.repository.create({
         product: { id: input.productId },
         imageId: input.imageId,
@@ -55,9 +58,15 @@ export class ProductPhotoRepository
         productPhotoEntitySaved = await transactionManager.save(
           productPhotoEntity
         );
+      } else {
+        productPhotoEntitySaved = await this.repository.save(
+          productPhotoEntity
+        );
       }
-      productPhotoEntitySaved = await this.repository.save(productPhotoEntity);
-      myLogger.debug("saved product photo in db");
+      myLogger.debug("saved product photo in db", {
+        productId: input.productId,
+        imageId: input.imageId,
+      });
       return productPhotoEntityToDomain(productPhotoEntitySaved);
     } catch (error) {
       if (error instanceof QueryFailedError) {
