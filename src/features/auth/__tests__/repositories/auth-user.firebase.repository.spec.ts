@@ -68,7 +68,7 @@ describe("firebase repository", () => {
   });
 
   describe("Get One By", () => {
-    beforeEach(async () => {
+    beforeAll(async () => {
       await firebaseUserRepository.deleteAll();
       authUser1 = await firebaseUserRepository.create({
         email: TEST_EMAILS.emailTest1,

@@ -10,6 +10,7 @@ import { TestDBHelper } from "test/test-db-helper";
 import { AppUser } from "@features/auth/entities/app-user";
 import { TEST_APP_USERS, TEST_USERS } from "../test-utils/users-test-data";
 import { RANDOM_USER_ID } from "../test-utils/firebase-test-helpers";
+import { myAppUserFactory } from "@features/auth/factories/app-user.factory";
 
 const logger = createTestLogger();
 const winstonLogger = new WinstonLogger(logger);
@@ -22,7 +23,9 @@ describe("app user repository", () => {
 
   beforeAll(async () => {
     await TestDBHelper.instance.setupTestDB();
-    appUserRepository = new AppUserRepository(TestDBHelper.instance.datasource);
+    const ds = TestDBHelper.instance.datasource;
+    const appUserFactory = myAppUserFactory(ds);
+    appUserRepository = appUserFactory.appUserRepository as AppUserRepository;
   });
 
   afterAll(async () => {
@@ -68,7 +71,7 @@ describe("app user repository", () => {
   describe("Get One By", () => {
     let appUser1: AppUser;
 
-    beforeEach(async () => {
+    beforeAll(async () => {
       await TestDBHelper.instance.clear();
       appUser1 = await appUserRepository.create(TEST_APP_USERS.appUserTest1);
     });
@@ -104,7 +107,7 @@ describe("app user repository", () => {
   describe("Update", () => {
     let appUser1: AppUser;
 
-    beforeEach(async () => {
+    beforeAll(async () => {
       await TestDBHelper.instance.clear();
       appUser1 = await appUserRepository.create(TEST_APP_USERS.appUserTest1);
     });
@@ -118,6 +121,7 @@ describe("app user repository", () => {
       expect(appUserUpdated.lastName).toBe("Jonaitis");
     });
   });
+
   describe("Delete", () => {
     let appUser1: AppUser;
 

@@ -3,44 +3,45 @@ import {
   createTestLogger,
   WinstonLogger,
 } from "@common/logging/winston-logger";
-import { FirebaseUserRepository } from "@features/auth/infrastructure/firebase/auth-user.firebase.repository";
-import { Auth as FirebaseAuth } from "firebase-admin/auth";
-import { getAuthFirebaseClient } from "@features/auth/infrastructure/firebase/firebase-app";
 import { RANDOM_USER_ID } from "../test-utils/firebase-test-helpers";
-import { AuthUserUseCase } from "@features/auth/use-cases/auth-user.use-case.";
 import { TEST_APP_USERS, TEST_EMAILS } from "../test-utils/users-test-data";
-import { ApplicationError, ErrorCode, InvalidInputError } from "@common/errors";
-import { AppUserUseCase } from "@features/auth/use-cases/app-user.use-case";
+import { ApplicationError, ErrorCode } from "@common/errors";
 import { TestDBHelper } from "test/test-db-helper";
-import { AppUserRepository } from "@features/auth/infrastructure/orm/repositories/app-user.repository";
-import { UserServiceUseCase } from "@features/auth/use-cases/user-service.use-case";
 import { User } from "@features/auth/entities/user";
+import { IUserServiceUseCase } from "@features/auth/ports/user-service.use-case.definition";
+import { IAppUserUseCase } from "@features/auth/ports/app-user.use-case.definition";
+import { IAuthUserUseCase } from "@features/auth/ports/auth-user.use-case.definition";
+import { IAuthUserRepository } from "@features/auth/ports/auth-user.repository.definition";
+import { myAuthUserFactory } from "@features/auth/factories/auth-user.factory";
+import { myAppUserFactory } from "@features/auth/factories/app-user.factory";
+import { myUserServiceFactory } from "@features/auth/factories/user-service-factory";
 
 const logger = createTestLogger();
 const winstonLogger = new WinstonLogger(logger);
 AppLogger.getAppLogger().setLogger(winstonLogger);
 
 describe("user service use-case", () => {
-  let authUserUseCase: AuthUserUseCase;
-  let appUserUseCase: AppUserUseCase;
-  let userServiceUseCase: UserServiceUseCase;
-  let authFirebaseClient: FirebaseAuth;
-  let firebaseUserRepository: FirebaseUserRepository;
+  let authUserUseCase: IAuthUserUseCase;
+  let appUserUseCase: IAppUserUseCase;
+  let userServiceUseCase: IUserServiceUseCase;
+  let authUserRepository: IAuthUserRepository;
 
   beforeAll(async () => {
     await TestDBHelper.instance.setupTestDB();
-    authFirebaseClient = getAuthFirebaseClient();
+    const ds = TestDBHelper.instance.datasource;
 
-    firebaseUserRepository = new FirebaseUserRepository(authFirebaseClient);
-    authUserUseCase = new AuthUserUseCase(firebaseUserRepository);
-    const appUserRepository = new AppUserRepository(
-      TestDBHelper.instance.datasource
-    );
-    appUserUseCase = new AppUserUseCase(appUserRepository);
-    userServiceUseCase = new UserServiceUseCase(
+    const authUserFactory = myAuthUserFactory();
+    authUserUseCase = authUserFactory.authUserUseCase;
+    authUserRepository = authUserFactory.authUserRepository;
+
+    const appUserFactory = myAppUserFactory(ds);
+    appUserUseCase = appUserFactory.appUserUseCase;
+
+    const userServiceFactory = myUserServiceFactory(
       authUserUseCase,
       appUserUseCase
     );
+    userServiceUseCase = userServiceFactory.userServiceUseCase;
   });
 
   afterAll(async () => {
@@ -49,7 +50,7 @@ describe("user service use-case", () => {
 
   describe("Create", () => {
     beforeEach(async () => {
-      await firebaseUserRepository.deleteAll();
+      await authUserRepository.deleteAll();
       await TestDBHelper.instance.clear();
       await userServiceUseCase.create({
         authUserData: {
@@ -119,8 +120,8 @@ describe("user service use-case", () => {
   describe("Get One By", () => {
     let user1: User;
 
-    beforeEach(async () => {
-      await firebaseUserRepository.deleteAll();
+    beforeAll(async () => {
+      await authUserRepository.deleteAll();
       await TestDBHelper.instance.clear();
       user1 = await userServiceUseCase.create({
         authUserData: {
@@ -171,7 +172,7 @@ describe("user service use-case", () => {
     let user: User;
 
     beforeEach(async () => {
-      await firebaseUserRepository.deleteAll();
+      await authUserRepository.deleteAll();
       await TestDBHelper.instance.clear();
       user = await userServiceUseCase.create({
         authUserData: {

@@ -3,33 +3,33 @@ import {
   createTestLogger,
   WinstonLogger,
 } from "@common/logging/winston-logger";
-import { FirebaseUserRepository } from "@features/auth/infrastructure/firebase/auth-user.firebase.repository";
-import { Auth as FirebaseAuth } from "firebase-admin/auth";
-import { getAuthFirebaseClient } from "@features/auth/infrastructure/firebase/firebase-app";
 import { AuthUser } from "@features/auth/entities/auth-user";
 import { RANDOM_USER_ID } from "../test-utils/firebase-test-helpers";
 import { AuthUserUseCase } from "@features/auth/use-cases/auth-user.use-case.";
 import { TEST_EMAILS } from "../test-utils/users-test-data";
 import { ApplicationError, ErrorCode, InvalidInputError } from "@common/errors";
+import { IAuthUserUseCase } from "@features/auth/ports/auth-user.use-case.definition";
+import { IAuthUserRepository } from "@features/auth/ports/auth-user.repository.definition";
+import { myAuthUserFactory } from "@features/auth/factories/auth-user.factory";
 
 const logger = createTestLogger();
 const winstonLogger = new WinstonLogger(logger);
 AppLogger.getAppLogger().setLogger(winstonLogger);
 
 describe("users use-case", () => {
-  let authUserUseCase: AuthUserUseCase;
-  let authFirebaseClient: FirebaseAuth;
-  let firebaseUserRepository: FirebaseUserRepository;
+  let authUserUseCase: IAuthUserUseCase;
+  let authUserRepository: IAuthUserRepository;
 
   beforeAll(async () => {
-    authFirebaseClient = getAuthFirebaseClient();
-    firebaseUserRepository = new FirebaseUserRepository(authFirebaseClient);
-    authUserUseCase = new AuthUserUseCase(firebaseUserRepository);
+    authUserUseCase = new AuthUserUseCase(authUserRepository);
+    const authUserFactory = myAuthUserFactory();
+    authUserUseCase = authUserFactory.authUserUseCase;
+    authUserRepository = authUserFactory.authUserRepository;
   });
 
   describe("Create", () => {
     beforeEach(async () => {
-      await firebaseUserRepository.deleteAll();
+      await authUserRepository.deleteAll();
       await authUserUseCase.create({
         data: {
           email: TEST_EMAILS.emailTest1,
@@ -80,7 +80,7 @@ describe("users use-case", () => {
     let authUser1: AuthUser;
 
     beforeEach(async () => {
-      await firebaseUserRepository.deleteAll();
+      await authUserRepository.deleteAll();
       authUser1 = await authUserUseCase.create({
         data: {
           email: TEST_EMAILS.emailTest1,
@@ -111,8 +111,8 @@ describe("users use-case", () => {
   describe("Get One By", () => {
     let authUser1: AuthUser;
 
-    beforeEach(async () => {
-      await firebaseUserRepository.deleteAll();
+    beforeAll(async () => {
+      await authUserRepository.deleteAll();
       authUser1 = await authUserUseCase.create({
         data: {
           email: TEST_EMAILS.emailTest1,

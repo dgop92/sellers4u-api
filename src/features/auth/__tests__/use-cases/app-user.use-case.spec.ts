@@ -3,28 +3,27 @@ import {
   createTestLogger,
   WinstonLogger,
 } from "@common/logging/winston-logger";
-
-import { AppUserRepository } from "@features/auth/infrastructure/orm/repositories/app-user.repository";
 import { TestDBHelper } from "test/test-db-helper";
 import { AppUser } from "@features/auth/entities/app-user";
 import { TEST_APP_USERS, TEST_USERS } from "../test-utils/users-test-data";
 import { AppUserUseCase } from "@features/auth/use-cases/app-user.use-case";
 import { ApplicationError, ErrorCode, InvalidInputError } from "@common/errors";
 import { RANDOM_USER_ID } from "../test-utils/firebase-test-helpers";
+import { myAppUserFactory } from "@features/auth/factories/app-user.factory";
+import { IAppUserUseCase } from "@features/auth/ports/app-user.use-case.definition";
 
 const logger = createTestLogger();
 const winstonLogger = new WinstonLogger(logger);
 AppLogger.getAppLogger().setLogger(winstonLogger);
 
 describe("app user use-case", () => {
-  let appUserUseCase: AppUserUseCase;
+  let appUserUseCase: IAppUserUseCase;
 
   beforeAll(async () => {
     await TestDBHelper.instance.setupTestDB();
-    const appUserRepository = new AppUserRepository(
-      TestDBHelper.instance.datasource
-    );
-    appUserUseCase = new AppUserUseCase(appUserRepository);
+    const ds = TestDBHelper.instance.datasource;
+    const appUserFactory = myAppUserFactory(ds);
+    appUserUseCase = appUserFactory.appUserUseCase;
   });
 
   afterAll(async () => {
@@ -118,7 +117,7 @@ describe("app user use-case", () => {
   describe("Get One By", () => {
     let appUser1: AppUser;
 
-    beforeEach(async () => {
+    beforeAll(async () => {
       await TestDBHelper.instance.clear();
       appUser1 = await appUserUseCase.create({
         data: TEST_APP_USERS.appUserTest1,
@@ -156,7 +155,7 @@ describe("app user use-case", () => {
 });
 
 describe("app users use-case invalid input", () => {
-  let appUserUseCase: AppUserUseCase;
+  let appUserUseCase: IAppUserUseCase;
 
   beforeAll(async () => {
     appUserUseCase = new AppUserUseCase(undefined!);
