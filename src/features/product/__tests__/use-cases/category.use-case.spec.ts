@@ -5,7 +5,9 @@ import {
   WinstonLogger,
 } from "@common/logging/winston-logger";
 import { Category } from "@features/product/entities/category";
-import { CategoryRepository } from "@features/product/infrastructure/orm/repositories/category.repository";
+import { myCategoryFactory } from "@features/product/factories/category/category.factory";
+import { ICategoryRepository } from "@features/product/ports/category.repository.definition";
+import { ICategoryUseCase } from "@features/product/ports/category.use-case.definition";
 import { CategoryUseCase } from "@features/product/use-cases/category.use-case";
 import { TestDBHelper } from "test/test-db-helper";
 import { TEST_CATEGORIES } from "../mocks/test-data";
@@ -15,15 +17,15 @@ const winstonLogger = new WinstonLogger(logger);
 AppLogger.getAppLogger().setLogger(winstonLogger);
 
 describe("category use-case", () => {
-  let categoryRepository: CategoryRepository;
-  let categoryUseCase: CategoryUseCase;
+  let categoryRepository: ICategoryRepository;
+  let categoryUseCase: ICategoryUseCase;
 
   beforeAll(async () => {
     await TestDBHelper.instance.setupTestDB();
-    categoryRepository = new CategoryRepository(
-      TestDBHelper.instance.datasource
-    );
-    categoryUseCase = new CategoryUseCase(categoryRepository);
+    const ds = TestDBHelper.instance.datasource;
+    const categoryFactory = myCategoryFactory(ds);
+    categoryRepository = categoryFactory.categoryRepository;
+    categoryUseCase = categoryFactory.categoryUseCase;
   });
 
   afterAll(async () => {
@@ -95,7 +97,7 @@ describe("category use-case", () => {
   describe("Get one by", () => {
     let category1: Category;
 
-    beforeEach(async () => {
+    beforeAll(async () => {
       await TestDBHelper.instance.clear();
       category1 = await categoryRepository.create(TEST_CATEGORIES.category1);
     });
@@ -127,7 +129,7 @@ describe("category use-case", () => {
   });
 
   describe("Get many by", () => {
-    beforeEach(async () => {
+    beforeAll(async () => {
       await TestDBHelper.instance.clear();
       await Promise.all([
         categoryRepository.create(TEST_CATEGORIES.category1),
@@ -150,7 +152,7 @@ describe("category use-case", () => {
 });
 
 describe("category use-case invalid input", () => {
-  let categoryUseCase: CategoryUseCase;
+  let categoryUseCase: ICategoryUseCase;
 
   beforeAll(async () => {
     categoryUseCase = new CategoryUseCase(undefined!);

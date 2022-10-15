@@ -4,6 +4,7 @@ import {
   WinstonLogger,
 } from "@common/logging/winston-logger";
 import { Category } from "@features/product/entities/category";
+import { myCategoryFactory } from "@features/product/factories/category/category.factory";
 import { CategoryRepository } from "@features/product/infrastructure/orm/repositories/category.repository";
 import { TestDBHelper } from "test/test-db-helper";
 import { TEST_CATEGORIES } from "../mocks/test-data";
@@ -17,9 +18,10 @@ describe("category repository", () => {
 
   beforeAll(async () => {
     await TestDBHelper.instance.setupTestDB();
-    categoryRepository = new CategoryRepository(
-      TestDBHelper.instance.datasource
-    );
+    const ds = TestDBHelper.instance.datasource;
+    const categoryFactory = myCategoryFactory(ds);
+    categoryRepository =
+      categoryFactory.categoryRepository as CategoryRepository;
   });
 
   afterAll(async () => {
@@ -103,7 +105,7 @@ describe("category repository", () => {
   describe("Get one by", () => {
     let category1: Category;
 
-    beforeEach(async () => {
+    beforeAll(async () => {
       await TestDBHelper.instance.clear();
       category1 = await categoryRepository.create(TEST_CATEGORIES.category1);
     });
@@ -136,7 +138,7 @@ describe("category repository", () => {
   });
 
   describe("Get many by", () => {
-    beforeEach(async () => {
+    beforeAll(async () => {
       await TestDBHelper.instance.clear();
       await Promise.all([
         categoryRepository.create(TEST_CATEGORIES.category1),

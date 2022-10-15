@@ -6,9 +6,10 @@ import {
 } from "@common/logging/winston-logger";
 import { Product } from "@features/product/entities/product";
 import { ProductPhoto } from "@features/product/entities/product-photo";
+import { myProductPhotoFactory } from "@features/product/factories/product-photo.factory";
+import { myProductFactory } from "@features/product/factories/product.factory";
 import { ProductPhotoEntity } from "@features/product/infrastructure/orm/entities/product-photo.orm";
 import { ProductPhotoRepository } from "@features/product/infrastructure/orm/repositories/product-photo.repository";
-import { ProductRepository } from "@features/product/infrastructure/orm/repositories/product.repository";
 import { TestDBHelper } from "test/test-db-helper";
 import {
   createTestBusiness,
@@ -28,23 +29,19 @@ describe("product-photo repository", () => {
 
   beforeAll(async () => {
     await TestDBHelper.instance.setupTestDB();
-    await TestDBHelper.instance.clear();
-    productPhotoRepository = new ProductPhotoRepository(
-      TestDBHelper.instance.datasource
-    );
+    const ds = TestDBHelper.instance.datasource;
 
-    // create setup data
-    const productRepository = new ProductRepository(
-      TestDBHelper.instance.datasource
-    );
-    const business1 = await createTestBusiness(
-      TestDBHelper.instance.datasource,
-      1
-    );
-    const category1 = await createTestCategory(
-      TestDBHelper.instance.datasource,
-      1
-    );
+    const productPhotoFactory = myProductPhotoFactory(ds);
+    const productFactory = myProductFactory(ds);
+
+    productPhotoRepository =
+      productPhotoFactory.productPhotoRepository as ProductPhotoRepository;
+
+    const productRepository = productFactory.productRepository;
+
+    const business1 = await createTestBusiness(ds, 1);
+    const category1 = await createTestCategory(ds, 1);
+
     product1 = await productRepository.create({
       ...TEST_PRODUCTS.product1,
       businessId: business1.id,
@@ -122,7 +119,7 @@ describe("product-photo repository", () => {
   describe("Get one by", () => {
     let productPhoto1: ProductPhoto;
 
-    beforeEach(async () => {
+    beforeAll(async () => {
       await TestDBHelper.instance.clearTable(ProductPhotoEntity);
       productPhoto1 = await productPhotoRepository.create({
         ...TEST_PRODUCT_PHOTOS.productPhoto1,
@@ -145,7 +142,7 @@ describe("product-photo repository", () => {
   });
 
   describe("Get many by", () => {
-    beforeEach(async () => {
+    beforeAll(async () => {
       await TestDBHelper.instance.clearTable(ProductPhotoEntity);
       await Promise.all([
         productPhotoRepository.create({

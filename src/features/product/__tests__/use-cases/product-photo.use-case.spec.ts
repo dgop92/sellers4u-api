@@ -6,13 +6,13 @@ import {
 import { BusinessEntity } from "@features/business/infrastructure/orm/entities/business.orm";
 import { Product } from "@features/product/entities/product";
 import { ProductPhoto } from "@features/product/entities/product-photo";
-import { ProductPhotoMockService } from "@features/product/infrastructure/image-service/product-photo.service.mock";
+import { myProductPhotoFactory } from "@features/product/factories/product-photo.factory";
+import { myProductFactory } from "@features/product/factories/product.factory";
 import { CategoryEntity } from "@features/product/infrastructure/orm/entities/category.orm";
 import { ProductPhotoEntity } from "@features/product/infrastructure/orm/entities/product-photo.orm";
-import { ProductPhotoRepository } from "@features/product/infrastructure/orm/repositories/product-photo.repository";
-import { ProductRepository } from "@features/product/infrastructure/orm/repositories/product.repository";
-import { IProductPhotoService } from "@features/product/ports/product-photo/product-photo.service.definition";
-import { ProductPhotoUseCase } from "@features/product/use-cases/product-photo.use-case";
+import { IProductPhotoRepository } from "@features/product/ports/product-photo/product-photo.repository.definition";
+import { IProductPhotoUseCase } from "@features/product/ports/product-photo/product-photo.use-case.definition";
+import { IProductRepository } from "@features/product/ports/product.repository.definition";
 import { TestDBHelper } from "test/test-db-helper";
 import {
   createTestBusiness,
@@ -25,10 +25,9 @@ const winstonLogger = new WinstonLogger(logger);
 AppLogger.getAppLogger().setLogger(winstonLogger);
 
 describe("product-photo use-case", () => {
-  let productPhotoRepository: ProductPhotoRepository;
-  let productRepository: ProductRepository;
-  let productPhotoUseCase: ProductPhotoUseCase;
-  let photoService: IProductPhotoService;
+  let productPhotoRepository: IProductPhotoRepository;
+  let productRepository: IProductRepository;
+  let productPhotoUseCase: IProductPhotoUseCase;
 
   let business1: BusinessEntity;
   let category1: CategoryEntity;
@@ -36,19 +35,18 @@ describe("product-photo use-case", () => {
 
   beforeAll(async () => {
     await TestDBHelper.instance.setupTestDB();
-    productPhotoRepository = new ProductPhotoRepository(
-      TestDBHelper.instance.datasource
-    );
+    const ds = TestDBHelper.instance.datasource;
 
-    photoService = new ProductPhotoMockService();
-    productPhotoUseCase = new ProductPhotoUseCase(
-      productPhotoRepository,
-      photoService
-    );
-    productRepository = new ProductRepository(TestDBHelper.instance.datasource);
+    const productPhotoFactory = myProductPhotoFactory(ds);
+    const productFactory = myProductFactory(ds);
 
-    business1 = await createTestBusiness(TestDBHelper.instance.datasource, 1);
-    category1 = await createTestCategory(TestDBHelper.instance.datasource, 1);
+    productPhotoUseCase = productPhotoFactory.productPhotoUseCase;
+    productPhotoRepository = productPhotoFactory.productPhotoRepository;
+    productRepository = productFactory.productRepository;
+
+    business1 = await createTestBusiness(ds, 1);
+    category1 = await createTestCategory(ds, 1);
+
     product1 = await productRepository.create({
       ...TEST_PRODUCTS.product1,
       businessId: business1.id,

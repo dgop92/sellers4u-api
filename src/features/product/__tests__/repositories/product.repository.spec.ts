@@ -6,6 +6,8 @@ import {
 } from "@common/logging/winston-logger";
 import { BusinessEntity } from "@features/business/infrastructure/orm/entities/business.orm";
 import { Product } from "@features/product/entities/product";
+import { myProductPhotoFactory } from "@features/product/factories/product-photo.factory";
+import { myProductFactory } from "@features/product/factories/product.factory";
 import { CategoryEntity } from "@features/product/infrastructure/orm/entities/category.orm";
 import { ProductEntity } from "@features/product/infrastructure/orm/entities/product.orm";
 import { ProductPhotoRepository } from "@features/product/infrastructure/orm/repositories/product-photo.repository";
@@ -32,16 +34,19 @@ describe("product repository", () => {
 
   beforeAll(async () => {
     await TestDBHelper.instance.setupTestDB();
-    await TestDBHelper.instance.clear();
-    productRepository = new ProductRepository(TestDBHelper.instance.datasource);
-    productPhotoRepository = new ProductPhotoRepository(
-      TestDBHelper.instance.datasource
-    );
+    const ds = TestDBHelper.instance.datasource;
 
-    business1 = await createTestBusiness(TestDBHelper.instance.datasource, 1);
-    business2 = await createTestBusiness(TestDBHelper.instance.datasource, 2);
-    category1 = await createTestCategory(TestDBHelper.instance.datasource, 1);
-    category2 = await createTestCategory(TestDBHelper.instance.datasource, 2);
+    const productPhotoFactory = myProductPhotoFactory(ds);
+    const productFactory = myProductFactory(ds);
+
+    productPhotoRepository =
+      productPhotoFactory.productPhotoRepository as ProductPhotoRepository;
+    productRepository = productFactory.productRepository as ProductRepository;
+
+    business1 = await createTestBusiness(ds, 1);
+    business2 = await createTestBusiness(ds, 2);
+    category1 = await createTestCategory(ds, 1);
+    category2 = await createTestCategory(ds, 2);
   });
 
   afterAll(async () => {

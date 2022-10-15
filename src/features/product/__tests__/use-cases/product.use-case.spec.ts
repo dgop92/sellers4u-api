@@ -5,15 +5,14 @@ import {
   WinstonLogger,
 } from "@common/logging/winston-logger";
 import { AppUser } from "@features/auth/entities/app-user";
+import { myBusinessFactory } from "@features/business/factories/business.factory";
 import { BusinessEntity } from "@features/business/infrastructure/orm/entities/business.orm";
-import { BusinessRepository } from "@features/business/infrastructure/orm/repositories/business.repository";
-import { BusinessUseCase } from "@features/business/use-cases/business.use-case";
 import { Product } from "@features/product/entities/product";
+import { myCategoryFactory } from "@features/product/factories/category/category.factory";
+import { myProductFactory } from "@features/product/factories/product.factory";
 import { CategoryEntity } from "@features/product/infrastructure/orm/entities/category.orm";
 import { ProductEntity } from "@features/product/infrastructure/orm/entities/product.orm";
-import { CategoryRepository } from "@features/product/infrastructure/orm/repositories/category.repository";
-import { ProductRepository } from "@features/product/infrastructure/orm/repositories/product.repository";
-import { CategoryUseCase } from "@features/product/use-cases/category.use-case";
+import { IProductRepository } from "@features/product/ports/product.repository.definition";
 import { ProductUseCase } from "@features/product/use-cases/product.use-case";
 import { TestDBHelper } from "test/test-db-helper";
 import {
@@ -27,7 +26,7 @@ const winstonLogger = new WinstonLogger(logger);
 AppLogger.getAppLogger().setLogger(winstonLogger);
 
 describe("product use-case", () => {
-  let productRepository: ProductRepository;
+  let productRepository: IProductRepository;
   let productUseCase: ProductUseCase;
   let appUser1: AppUser;
   let appUser2: AppUser;
@@ -38,32 +37,29 @@ describe("product use-case", () => {
 
   beforeAll(async () => {
     await TestDBHelper.instance.setupTestDB();
-    productRepository = new ProductRepository(TestDBHelper.instance.datasource);
-    const businessRepository = new BusinessRepository(
-      TestDBHelper.instance.datasource
-    );
-    const categoryRepository = new CategoryRepository(
-      TestDBHelper.instance.datasource
-    );
-    const businessUseCase = new BusinessUseCase(businessRepository);
-    const categoryUseCase = new CategoryUseCase(categoryRepository);
-    productUseCase = new ProductUseCase(productRepository);
-    productUseCase.setDependencies(businessUseCase, categoryUseCase);
+    const ds = TestDBHelper.instance.datasource;
 
-    const businessAppUser1 = await createTestBusinessWithAppUser(
-      TestDBHelper.instance.datasource,
-      1
+    const productFactory = myProductFactory(ds);
+    const businessFactory = myBusinessFactory(ds);
+    const categoryFactory = myCategoryFactory(ds);
+
+    productRepository = productFactory.productRepository;
+    productUseCase = productFactory.productUseCase as ProductUseCase;
+    productUseCase.setDependencies(
+      businessFactory.businessUseCase,
+      categoryFactory.categoryUseCase
     );
-    const businessAppUser2 = await createTestBusinessWithAppUser(
-      TestDBHelper.instance.datasource,
-      2
-    );
+
+    const businessAppUser1 = await createTestBusinessWithAppUser(ds, 1);
+    const businessAppUser2 = await createTestBusinessWithAppUser(ds, 2);
+
     business1 = businessAppUser1.business;
     business2 = businessAppUser2.business;
     appUser1 = businessAppUser1.appUser;
     appUser2 = businessAppUser2.appUser;
-    category1 = await createTestCategory(TestDBHelper.instance.datasource, 1);
-    category2 = await createTestCategory(TestDBHelper.instance.datasource, 2);
+
+    category1 = await createTestCategory(ds, 1);
+    category2 = await createTestCategory(ds, 2);
   });
 
   afterAll(async () => {
