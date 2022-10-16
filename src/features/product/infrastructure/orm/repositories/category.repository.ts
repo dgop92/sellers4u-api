@@ -1,3 +1,4 @@
+import { ErrorCode, RepositoryError } from "@common/errors";
 import { AppLogger } from "@common/logging/logger";
 import { BaseRepository } from "@common/orm/base-repository";
 import {
@@ -15,6 +16,7 @@ import { CategorySearchInput } from "@features/product/schema-types";
 import {
   DataSource,
   EntityManager,
+  QueryFailedError,
   Repository,
   SelectQueryBuilder,
 } from "typeorm";
@@ -41,13 +43,27 @@ export class CategoryRepository
     categoryEntityToSave: CategoryEntity,
     transactionManager?: EntityManager
   ): Promise<Category> {
-    let categoryEntity: CategoryEntity;
-    if (transactionManager) {
-      categoryEntity = await transactionManager.save(categoryEntityToSave);
-    } else {
-      categoryEntity = await this.repository.save(categoryEntityToSave);
+    try {
+      let categoryEntity: CategoryEntity;
+      if (transactionManager) {
+        categoryEntity = await transactionManager.save(categoryEntityToSave);
+      } else {
+        categoryEntity = await this.repository.save(categoryEntityToSave);
+      }
+      return categoryEntityToDomain(categoryEntity);
+    } catch (error) {
+      if (error instanceof QueryFailedError) {
+        if (error.driverError.constraint === "unique_category_name") {
+          throw new RepositoryError(
+            "category with given name already exists",
+            ErrorCode.DUPLICATED_RECORD,
+            { fieldName: "name" }
+          );
+        }
+      }
+      myLogger.error(error?.stack);
+      throw error;
     }
-    return categoryEntityToDomain(categoryEntity);
   }
 
   create(input: CategoryCreateRepoData): Promise<Category>;

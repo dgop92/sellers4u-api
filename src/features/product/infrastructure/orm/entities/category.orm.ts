@@ -6,10 +6,12 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   OneToMany,
+  Unique,
 } from "typeorm";
 import { ProductEntity } from "./product.orm";
 
 @Entity()
+@Unique("unique_category_name", ["name"])
 export class CategoryEntity {
   @PrimaryGeneratedColumn()
   id: number;

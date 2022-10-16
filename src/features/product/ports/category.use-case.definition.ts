@@ -15,6 +15,11 @@ export interface ICategoryUseCase {
     input: CategoryCreateInput,
     transactionManager: any
   ): Promise<Category>;
+  getOrCreate(input: CategoryCreateInput): Promise<Category>;
+  getOrCreate(
+    input: CategoryCreateInput,
+    transactionManager: any
+  ): Promise<Category>;
   update(input: CategoryUpdateInput): Promise<Category>;
   update(
     input: CategoryUpdateInput,

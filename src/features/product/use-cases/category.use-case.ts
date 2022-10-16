@@ -38,6 +38,30 @@ export class CategoryUseCase implements ICategoryUseCase {
     return this.repository.create(input.data, transactionManager);
   }
 
+  getOrCreate(input: CategoryCreateInput): Promise<Category>;
+  getOrCreate(
+    input: CategoryCreateInput,
+    transactionManager: any
+  ): Promise<Category>;
+  async getOrCreate(
+    input: CategoryCreateInput,
+    transactionManager?: unknown
+  ): Promise<Category> {
+    const { name } = input.data;
+    myLogger.debug("getting category by", { name });
+    let category = await this.repository.getOneBy(
+      {
+        searchBy: { name },
+      },
+      transactionManager
+    );
+    if (!category) {
+      myLogger.debug("category not found, creating new one", { name });
+      category = await this.repository.create(input.data, transactionManager);
+    }
+    return category;
+  }
+
   update(input: CategoryUpdateInput): Promise<Category>;
   update(
     input: CategoryUpdateInput,
