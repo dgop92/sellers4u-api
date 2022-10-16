@@ -18,7 +18,9 @@ export class BusinessEntity {
   @Column("varchar", { length: 130, nullable: false })
   name: string;
 
-  @OneToOne(() => AppUserEntity)
+  @OneToOne(() => AppUserEntity, {
+    onDelete: "CASCADE",
+  })
   @JoinColumn()
   appUser?: AppUserEntity;
 

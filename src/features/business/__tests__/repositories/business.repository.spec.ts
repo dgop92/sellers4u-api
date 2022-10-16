@@ -103,6 +103,13 @@ describe("business repository", () => {
       });
       expect(businessRetrieved).toBeUndefined();
     });
+    it("should delete a business if app-user is deleted", async () => {
+      await appUserRepository.delete(appUser1);
+      const businessRetrieved = await businessRepository.getOneBy({
+        searchBy: { id: business1.id },
+      });
+      expect(businessRetrieved).toBeUndefined();
+    });
   });
 
   describe("Get one by", () => {

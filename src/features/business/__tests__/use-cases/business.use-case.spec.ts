@@ -285,10 +285,10 @@ describe("business use-case invalid input", () => {
       }
     });
 
-    it("should throw an error if name has less than 5 characters", async () => {
+    it("should throw an error if name has less than 2 characters", async () => {
       try {
         await businessUseCase.create(
-          { data: { name: Array(4).join("x") } },
+          { data: { name: Array(1).join("x") } },
           undefined!
         );
       } catch (error) {
@@ -317,10 +317,10 @@ describe("business use-case invalid input", () => {
       }
     });
 
-    it("should throw an error if name has less than 5 characters", async () => {
+    it("should throw an error if name has less than 2 characters", async () => {
       try {
         await businessUseCase.update(
-          { data: { name: Array(4).join("x") } },
+          { data: { name: Array(2).join("x") } },
           undefined!
         );
       } catch (error) {
