@@ -22,7 +22,9 @@ export class ProductPhotoEntity {
   @Column("varchar", { length: 100, nullable: false })
   imageId: string;
 
-  @ManyToOne(() => ProductEntity, (product) => product.photos)
+  @ManyToOne(() => ProductEntity, (product) => product.photos, {
+    onDelete: "CASCADE",
+  })
   product: ProductEntity;
 
   @CreateDateColumn({ nullable: false })

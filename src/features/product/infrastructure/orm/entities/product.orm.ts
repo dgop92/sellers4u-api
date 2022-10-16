@@ -28,7 +28,9 @@ export class ProductEntity {
   @Column("varchar", { length: 50, nullable: false })
   code: string;
 
-  @ManyToOne(() => CategoryEntity, (category) => category.products)
+  @ManyToOne(() => CategoryEntity, (category) => category.products, {
+    onDelete: "RESTRICT",
+  })
   category?: CategoryEntity;
 
   @Column("integer", { nullable: false })
@@ -37,7 +39,9 @@ export class ProductEntity {
   @OneToMany(() => ProductPhotoEntity, (photo) => photo.product)
   photos?: ProductPhotoEntity[];
 
-  @ManyToOne(() => BusinessEntity)
+  @ManyToOne(() => BusinessEntity, {
+    onDelete: "CASCADE",
+  })
   business?: BusinessEntity;
 
   @CreateDateColumn({ nullable: false })

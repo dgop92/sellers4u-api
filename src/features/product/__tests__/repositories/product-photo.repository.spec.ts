@@ -4,12 +4,15 @@ import {
   createTestLogger,
   WinstonLogger,
 } from "@common/logging/winston-logger";
+import { BusinessEntity } from "@features/business/infrastructure/orm/entities/business.orm";
 import { Product } from "@features/product/entities/product";
 import { ProductPhoto } from "@features/product/entities/product-photo";
 import { myProductPhotoFactory } from "@features/product/factories/product-photo.factory";
 import { myProductFactory } from "@features/product/factories/product.factory";
+import { CategoryEntity } from "@features/product/infrastructure/orm/entities/category.orm";
 import { ProductPhotoEntity } from "@features/product/infrastructure/orm/entities/product-photo.orm";
 import { ProductPhotoRepository } from "@features/product/infrastructure/orm/repositories/product-photo.repository";
+import { ProductRepository } from "@features/product/infrastructure/orm/repositories/product.repository";
 import { TestDBHelper } from "test/test-db-helper";
 import {
   createTestBusiness,
@@ -24,8 +27,11 @@ AppLogger.getAppLogger().setLogger(winstonLogger);
 
 describe("product-photo repository", () => {
   let productPhotoRepository: ProductPhotoRepository;
+  let productRepository: ProductRepository;
   let product1: Product;
   let product2: Product;
+  let business1: BusinessEntity;
+  let category1: CategoryEntity;
 
   beforeAll(async () => {
     await TestDBHelper.instance.setupTestDB();
@@ -36,11 +42,10 @@ describe("product-photo repository", () => {
 
     productPhotoRepository =
       productPhotoFactory.productPhotoRepository as ProductPhotoRepository;
+    productRepository = productFactory.productRepository as ProductRepository;
 
-    const productRepository = productFactory.productRepository;
-
-    const business1 = await createTestBusiness(ds, 1);
-    const category1 = await createTestCategory(ds, 1);
+    business1 = await createTestBusiness(ds, 1);
+    category1 = await createTestCategory(ds, 1);
 
     product1 = await productRepository.create({
       ...TEST_PRODUCTS.product1,
@@ -111,6 +116,22 @@ describe("product-photo repository", () => {
       await productPhotoRepository.delete(productPhoto1);
       const productPhotoRetrieved = await productPhotoRepository.getOneBy({
         searchBy: { imageId: productPhoto1.imageId },
+      });
+      expect(productPhotoRetrieved).toBeUndefined();
+    });
+    it("should delete all product photos if product is deleted", async () => {
+      const product3 = await productRepository.create({
+        ...TEST_PRODUCTS.product3,
+        businessId: business1.id,
+        categoryId: category1.id,
+      });
+      const pp = await productPhotoRepository.create({
+        ...TEST_PRODUCT_PHOTOS.productPhoto3,
+        productId: product3.id,
+      });
+      await productRepository.delete(product3);
+      const productPhotoRetrieved = await productPhotoRepository.getOneBy({
+        searchBy: { imageId: pp.imageId },
       });
       expect(productPhotoRetrieved).toBeUndefined();
     });

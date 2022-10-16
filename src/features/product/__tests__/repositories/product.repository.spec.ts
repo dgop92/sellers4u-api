@@ -4,7 +4,9 @@ import {
   createTestLogger,
   WinstonLogger,
 } from "@common/logging/winston-logger";
+import { myBusinessFactory } from "@features/business/factories/business.factory";
 import { BusinessEntity } from "@features/business/infrastructure/orm/entities/business.orm";
+import { BusinessRepository } from "@features/business/infrastructure/orm/repositories/business.repository";
 import { Product } from "@features/product/entities/product";
 import { myProductPhotoFactory } from "@features/product/factories/product-photo.factory";
 import { myProductFactory } from "@features/product/factories/product.factory";
@@ -27,6 +29,7 @@ AppLogger.getAppLogger().setLogger(winstonLogger);
 describe("product repository", () => {
   let productRepository: ProductRepository;
   let productPhotoRepository: ProductPhotoRepository;
+  let businessRepository: BusinessRepository;
   let business1: BusinessEntity;
   let business2: BusinessEntity;
   let category1: CategoryEntity;
@@ -38,10 +41,13 @@ describe("product repository", () => {
 
     const productPhotoFactory = myProductPhotoFactory(ds);
     const productFactory = myProductFactory(ds);
+    const businessFactory = myBusinessFactory(ds);
 
     productPhotoRepository =
       productPhotoFactory.productPhotoRepository as ProductPhotoRepository;
     productRepository = productFactory.productRepository as ProductRepository;
+    businessRepository =
+      businessFactory.businessRepository as BusinessRepository;
 
     business1 = await createTestBusiness(ds, 1);
     business2 = await createTestBusiness(ds, 2);
@@ -195,6 +201,27 @@ describe("product repository", () => {
         searchBy: { id: product1.id },
       });
       expect(productRetrieved).toBeUndefined();
+    });
+    it("should delete all product if business is deleted", async () => {
+      const business3 = await createTestBusiness(
+        TestDBHelper.instance.datasource,
+        3
+      );
+      await productRepository.create({
+        ...TEST_PRODUCTS.product1,
+        businessId: business3.id,
+        categoryId: category1.id,
+      });
+      await productRepository.create({
+        ...TEST_PRODUCTS.product2,
+        businessId: business3.id,
+        categoryId: category1.id,
+      });
+      await businessRepository.delete(business3);
+      const products = await productRepository.getManyBy({
+        searchBy: { businessId: business3.id },
+      });
+      expect(products.count).toBe(0);
     });
   });
 
