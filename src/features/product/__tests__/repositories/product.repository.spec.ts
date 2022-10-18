@@ -112,6 +112,36 @@ describe("product repository", () => {
         }
       }
     });
+    it("should throw an error if try to create a product with a category that doesn't exit", async () => {
+      try {
+        await productRepository.create({
+          ...TEST_PRODUCTS.product2,
+          businessId: business1.id,
+          categoryId: 1234,
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(RepositoryError);
+        if (error instanceof RepositoryError) {
+          expect(error.errorCode).toBe(ErrorCode.NOT_FOUND);
+          expect(error.message).toMatch(/category/i);
+        }
+      }
+    });
+    it("should throw an error if try to create a product with a business that doesn't exit", async () => {
+      try {
+        await productRepository.create({
+          ...TEST_PRODUCTS.product2,
+          businessId: 12355,
+          categoryId: category1.id,
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(RepositoryError);
+        if (error instanceof RepositoryError) {
+          expect(error.errorCode).toBe(ErrorCode.NOT_FOUND);
+          expect(error.message).toMatch(/business/i);
+        }
+      }
+    });
   });
 
   describe("Update", () => {

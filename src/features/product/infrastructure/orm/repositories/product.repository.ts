@@ -62,6 +62,21 @@ export class ProductRepository
             { fieldName: "code" }
           );
         }
+        if (error.driverError.constraint === "fk_product_category") {
+          throw new RepositoryError(
+            "the assigned category does not exist",
+            ErrorCode.NOT_FOUND,
+            { fieldName: "category" }
+          );
+        }
+        // This error is unlikely to happen
+        if (error.driverError.constraint === "fk_product_business") {
+          throw new RepositoryError(
+            "the assigned business does not exist",
+            ErrorCode.NOT_FOUND,
+            { fieldName: "business" }
+          );
+        }
       }
       myLogger.error(error?.stack);
       throw error;

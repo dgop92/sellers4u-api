@@ -77,6 +77,13 @@ export class ProductPhotoRepository
             { fieldName: "imageId" }
           );
         }
+        if (error.driverError.constraint === "fk_product_photo_product") {
+          throw new RepositoryError(
+            "the assigned product does not exist",
+            ErrorCode.NOT_FOUND,
+            { fieldName: "product" }
+          );
+        }
       }
       myLogger.error(error?.stack);
       throw error;

@@ -1,6 +1,7 @@
 import { APP_ENV_VARS } from "@common/config/app-env-vars";
 import { AppLogger } from "@common/logging/logger";
 import { myAuthUserFactory } from "@features/auth/factories/auth-user.factory";
+import { createAppCategories } from "@features/product/factories/category/create-categories";
 import {
   Body,
   Controller,
@@ -86,6 +87,10 @@ export class TestUtilControllerV1 {
           break;
         case "product":
           result = await setupProductModuleData();
+          break;
+        case "category":
+          result = await createAppCategories();
+          break;
         default:
           throw new HttpException(
             {

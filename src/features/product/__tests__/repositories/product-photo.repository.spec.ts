@@ -99,6 +99,20 @@ describe("product-photo repository", () => {
         }
       }
     });
+    it("should throw an error if try to add a photo to a product that doesn't exits", async () => {
+      try {
+        await productPhotoRepository.create({
+          ...TEST_PRODUCT_PHOTOS.productPhoto3,
+          productId: 1245,
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(RepositoryError);
+        if (error instanceof RepositoryError) {
+          expect(error.errorCode).toBe(ErrorCode.NOT_FOUND);
+          expect(error.message).toMatch(/product/i);
+        }
+      }
+    });
   });
 
   describe("Delete", () => {

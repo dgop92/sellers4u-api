@@ -89,8 +89,19 @@ export class ProductControllerV1 {
 
   @Get("photos/:imageId")
   @UseGuards(UserGuard)
-  getPhoto(@Param("imageId") imageId: string) {
-    return this.productPhotoUseCase.getOneBy({ searchBy: { imageId } });
+  async getPhoto(@Param("imageId") imageId: string) {
+    const productPhoto = await this.productPhotoUseCase.getOneBy({
+      searchBy: { imageId },
+    });
+
+    if (!productPhoto) {
+      throw new PresentationError(
+        "product photo not found",
+        ErrorCode.NOT_FOUND
+      );
+    }
+
+    return productPhoto;
   }
 
   @UseGuards(UserGuard)

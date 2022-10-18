@@ -7,6 +7,7 @@ import {
   DeleteDateColumn,
   ManyToOne,
   Unique,
+  JoinColumn,
 } from "typeorm";
 import { ProductEntity } from "./product.orm";
 
@@ -25,6 +26,7 @@ export class ProductPhotoEntity {
   @ManyToOne(() => ProductEntity, (product) => product.photos, {
     onDelete: "CASCADE",
   })
+  @JoinColumn({ foreignKeyConstraintName: "fk_product_photo_product" })
   product: ProductEntity;
 
   @CreateDateColumn({ nullable: false })

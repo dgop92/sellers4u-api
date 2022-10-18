@@ -9,6 +9,7 @@ import {
   ManyToOne,
   OneToMany,
   Unique,
+  JoinColumn,
 } from "typeorm";
 import { CategoryEntity } from "./category.orm";
 import { ProductPhotoEntity } from "./product-photo.orm";
@@ -31,6 +32,7 @@ export class ProductEntity {
   @ManyToOne(() => CategoryEntity, (category) => category.products, {
     onDelete: "RESTRICT",
   })
+  @JoinColumn({ foreignKeyConstraintName: "fk_product_category" })
   category?: CategoryEntity;
 
   @Column("integer", { nullable: false })
@@ -42,6 +44,7 @@ export class ProductEntity {
   @ManyToOne(() => BusinessEntity, {
     onDelete: "CASCADE",
   })
+  @JoinColumn({ foreignKeyConstraintName: "fk_product_business" })
   business?: BusinessEntity;
 
   @CreateDateColumn({ nullable: false })
