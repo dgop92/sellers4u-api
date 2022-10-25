@@ -1,4 +1,5 @@
 import { AppLogger } from "@common/logging/logger";
+import { User } from "@features/auth/entities/user";
 import { myBusinessFactory } from "@features/business/factories/business.factory";
 import { setupAuthModuleData } from "./auth.setup-data";
 
@@ -16,9 +17,8 @@ export const TEST_SERVER_BUSINESS = {
 
 const myLogger = AppLogger.getAppLogger().createFileLogger(__filename);
 
-async function setupBusinessData() {
+async function setupBusinessData(users: User[]) {
   const { businessUseCase } = myBusinessFactory();
-  const { users } = await setupAuthModuleData();
 
   const user1 = users.find((u) => u.appUser.firstName === "John")!;
   const user2 = users.find((u) => u.appUser.firstName === "Juan")!;
@@ -41,6 +41,7 @@ async function setupBusinessData() {
 }
 
 export async function setupBusinessModuleData() {
-  const businesses = await setupBusinessData();
-  return { businesses };
+  const { users } = await setupAuthModuleData();
+  const businesses = await setupBusinessData(users);
+  return { users, businesses };
 }

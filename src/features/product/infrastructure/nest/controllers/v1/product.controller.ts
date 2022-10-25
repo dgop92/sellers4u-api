@@ -115,7 +115,7 @@ export class ProductControllerV1 {
   }
 
   @UseGuards(UserGuard)
-  @Delete()
+  @Delete(":id")
   delete(@Param("id", ParseIntPipe) id: number, @GetUser() user: User) {
     return this.productUseCase.delete({ id }, user.appUser);
   }
