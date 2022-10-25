@@ -1,6 +1,6 @@
 # Sellers4U API
 
-Description
+O2O (online to offline) Marketplace for university students. Some students create businesses and publish products or services. On the other hand, students that are interested in those products contact the business to manage the purchase
 
 ## Project environments
 
@@ -9,6 +9,8 @@ Development
 - Data is preserved when restarting the server
 - External services are not mocked but are created in a development environment
 - Run with: `npm run dev`
+
+Test
 
 - Data is deleted when restarting the server
 - External services are mocked
