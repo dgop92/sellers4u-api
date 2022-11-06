@@ -9,6 +9,8 @@ export function businessEntityToDomain(entity: BusinessEntity): Business {
   const business: Business = {
     id: entity.id,
     name: entity.name,
+    shortDescription: entity.shortDescription,
+    description: entity.description,
     createdAt: entity.createdAt,
     updatedAt: entity.updatedAt,
     deletedAt: entity.deletedAt,
@@ -23,6 +25,8 @@ export function businessEntityFromDomain(business: Business): BusinessEntity {
   const businessEntity = new BusinessEntity();
   businessEntity.id = business.id;
   businessEntity.name = business.name;
+  businessEntity.shortDescription = business.shortDescription;
+  businessEntity.description = business.description;
   businessEntity.createdAt = business.createdAt;
   businessEntity.updatedAt = business.updatedAt;
   businessEntity.deletedAt = business.deletedAt;

@@ -5,6 +5,8 @@ import Joi from "joi";
 export interface Business {
   id: number;
   name: string;
+  shortDescription: string;
+  description: string;
   owner?: AppUser;
   createdAt: Date;
   updatedAt: Date;
@@ -32,11 +34,15 @@ export const BusinessSearchInputSchema = Joi.object({
 export const BusinessCreateInputSchema = Joi.object({
   data: Joi.object({
     name: Joi.string().min(2).max(100).required(),
+    shortDescription: Joi.string().min(2).max(100).optional(),
+    description: Joi.string().min(2).max(1000).optional(),
   }).required(),
 }).meta({ className: "BusinessCreateInput" });
 
 export const BusinessUpdateInputSchema = Joi.object({
   data: Joi.object({
     name: Joi.string().min(5).max(100).optional(),
+    shortDescription: Joi.string().min(2).max(100).optional(),
+    description: Joi.string().min(2).max(1000).optional(),
   }).required(),
 }).meta({ className: "BusinessUpdateInput" });

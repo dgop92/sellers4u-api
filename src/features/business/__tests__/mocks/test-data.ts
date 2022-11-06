@@ -19,11 +19,15 @@ export const TEST_APP_USERS = {
 export const TEST_BUSINESS = {
   business1: {
     name: "test business 1",
+    shortDescription: "test business 1 short description",
+    description: "test business 1 description",
   },
   business2: {
     name: "test business 2",
+    shortDescription: "test business 2 short description",
   },
   business3: {
     name: "no common name 2",
+    description: "test business 3 description",
   },
 };

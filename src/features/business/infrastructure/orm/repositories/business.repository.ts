@@ -70,9 +70,17 @@ export class BusinessRepository
       appUserId: appUser.id,
     });
     const appUserEntity = appUserEntityFromDomain(appUser);
+
     const businessEntity = new BusinessEntity();
     businessEntity.name = input.name;
     businessEntity.appUser = appUserEntity;
+    if (input.shortDescription) {
+      businessEntity.shortDescription = input.shortDescription;
+    }
+    if (input.description) {
+      businessEntity.description = input.description;
+    }
+
     const business = await this.saveBusinessEntity(
       businessEntity,
       transactionManager
@@ -102,6 +110,14 @@ export class BusinessRepository
 
     if (input.name) {
       businessEntity.name = input.name;
+    }
+
+    if (input.shortDescription) {
+      businessEntity.shortDescription = input.shortDescription;
+    }
+
+    if (input.description) {
+      businessEntity.description = input.description;
     }
 
     const businessUpdated = await this.saveBusinessEntity(

@@ -5,7 +5,9 @@
 
 export interface BusinessCreateInput {
   data: {
+    description?: string;
     name: string;
+    shortDescription?: string;
   };
 }
 
@@ -36,6 +38,8 @@ export interface BusinessSearchInput {
 
 export interface BusinessUpdateInput {
   data: {
+    description?: string;
     name?: string;
+    shortDescription?: string;
   };
 }

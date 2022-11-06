@@ -18,6 +18,12 @@ export class BusinessEntity {
   @Column("varchar", { length: 130, nullable: false })
   name: string;
 
+  @Column("varchar", { length: 100, nullable: false, default: "" })
+  shortDescription: string;
+
+  @Column("text", { nullable: false, default: "" })
+  description: string;
+
   @OneToOne(() => AppUserEntity, {
     onDelete: "CASCADE",
   })
