@@ -13,6 +13,7 @@ export const APP_ENV_VARS = {
   isTest: getOsEnv("NODE_ENV") === "test",
   port: parseIntOrThrow(process.env.PORT || getOsEnv("APP_PORT")),
   db: {
+    dbUrl: getOsEnvOrDefault("DATABASE_URL", ""),
     migrations: [getOsPath("TYPEORM_MIGRATIONS")],
     migrationsDir: getOsPath("TYPEORM_MIGRATION_CLI_DIR"),
     type: getOsEnv("TYPEORM_CONNECTION"),
